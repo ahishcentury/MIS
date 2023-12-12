@@ -16,7 +16,7 @@ module.exports = async function (req, res, next) {
         if (!validator.isEmail(email) || !validator.isAlpha(fname) || !validator.isAlpha(lname))
             return res.status(400).end();
         result = await new User({
-            fname, lname, email, phone, dob, role: mongoose.Types.ObjectId(role), password: phone
+            fname, lname, email, phone, dob, role: new mongoose.Types.ObjectId(role), password: phone
         }).save();
         if (result) {
             res.json({

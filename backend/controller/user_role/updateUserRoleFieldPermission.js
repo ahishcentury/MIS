@@ -6,7 +6,7 @@ module.exports = async function (req, res) {
         perms,
         _id,
     } = req.body["data"];
-    let data = await UserRole.updateOne({ _id: _id }, { $set: { perms: perms } });
+    let data = await UserRole.updateOne({ _id: _id }, { $set: { perms: perms, updatedAt: new Date().toISOString() } });
     if (data) {
         res.json(data);
     }

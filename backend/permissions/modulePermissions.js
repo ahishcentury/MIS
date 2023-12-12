@@ -1,22 +1,26 @@
 let MODULEPERMISSIONS = [
     {
-        moduleName: "credit",
+        moduleName: "Fee Group",
         permission: { roles: {} }
     },
     {
-        moduleName: "funding",
+        moduleName: "Securities",
         permission: { roles: {} }
     },
     {
-        moduleName: "tax",
+        moduleName: "User Roles",
         permission: { roles: {} }
     },
     {
-        moduleName: "VAT",
+        moduleName: "Users",
         permission: { roles: {} }
     },
     {
-        moduleName: "products",
+        moduleName: "SMTP Setup",
+        permission: { roles: {} }
+    },
+    {
+        moduleName: "Holding Cost",
         permission: { roles: {} }
     }
 ];

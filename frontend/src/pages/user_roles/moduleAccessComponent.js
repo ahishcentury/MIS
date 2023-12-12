@@ -29,8 +29,18 @@ export default function ModuleAccessComponent(props) {
     const colorArray = ["gray", "orange", "green"];
 
     useEffect(() => {
+        console.log("I m here In ", module);
+        // console.log("I m here In module Down", module.length)
+        // console.log(module[0].permission)
+        // console.log(module)
+        // console.log(!Array.isArray(module[0].permission))
+        // if (!Array.isArray(module[0].permission)) {
+        //     let modifiedArray = []
+        //     modifiedArray.push(module[0].permission);
+        //     module[0].permission = modifiedArray;
+        //     console.log("I m in array Block");
+        // }
         if (module.length != 0 && module != undefined) {
-            console.log(module, "Module Error Check")
             setSwitchOneState(module[0].permission.roles[selectedRole.roleName][0]);
             setSwitchTwoState(module[0].permission.roles[selectedRole.roleName][1]);
             setSwitchThreeState(module[0].permission.roles[selectedRole.roleName][2]);

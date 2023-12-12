@@ -30,7 +30,9 @@ export const FETCH_FORMATTED_FILE_MASTER_BY_NAME = BASE_URL + "/users/fetchForma
 
 export const UPDATE_SMTP = BASE_URL + "/users/updateSmtpDetails";
 
-export const ADD_NEW_ROLE = BASE_URL + "/users/addUserRole";
+export const GET_SMTP = BASE_URL + "/users/getSmtpDetails";
+
+export const ADD_USER_ROLE = BASE_URL + "/users/addUserRole";
 
 export const GET_USER_ROLES = BASE_URL + "/users/getUserRoles";
 

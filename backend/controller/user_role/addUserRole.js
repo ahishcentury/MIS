@@ -6,7 +6,6 @@ module.exports = async function (req, res) {
         desc
     } = req.body;
     let roleExisted = await UserRole.findOne({ roleName: roleName });
-    console.log(roleExisted)
     if (!roleExisted) {
         let modulePermission = PERMISSIONS;
         new UserRole({

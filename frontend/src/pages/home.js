@@ -16,11 +16,13 @@ import moment from 'moment';
 import HoldingCostFileUploads from './holding_cost';
 import UserRoles from './user_roles';
 import Users from './users';
+import axios from 'axios';
 import { UserRoleContextProvider } from './user_roles/userRoleContext';
+import { CHECK_ALLOWED_USERS } from '../helper/apiString';
 const drawerWidth = 240;
 
 
-export default function BackOfficeHome(props) {
+export default function Home(props) {
     const { window } = props;
     let { module } = useParams();
     const context = useContext(AppContext);
@@ -28,9 +30,15 @@ export default function BackOfficeHome(props) {
     const [notifications, setNotifications] = useState([]);
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [tabPanelValue, setTabPanelValue] = useState(module);
-
+    const [allowedModuleByRole, setAllowedModuleByRole] = useState(false);
+    const [tablistCompleted, setTablistCompleted] = useState(false);
     const toggleButtonStyle = { sx: { textTransform: 'none', color: context.headingColor } };
-
+    let [tabList, setTabList] = useState([
+        { label: 'Fee Groups', value: 'feeGroups' },
+        { label: 'Securities', value: 'securities' },
+        { label: "SMTP Setup", value: 'smtp' },
+        { label: "Holding Cost", value: 'holdingCost' }
+    ]);
 
 
     const logout = () => {
@@ -46,13 +54,27 @@ export default function BackOfficeHome(props) {
 
 
     const appbarWidth = 80;
-
-
-
+    function userAuth() {
+        axios.post(CHECK_ALLOWED_USERS, { userType: "MISA", userEmail: "mumshad@century.ae" })
+            .then((res) => {
+                if (!tablistCompleted && !allowedModuleByRole) {
+                    tabList.push({ label: 'User Roles', value: 'userRoles' })
+                    tabList.push({ label: 'Users', value: 'users' })
+                }
+                setTablistCompleted(true);
+                // setAllowedModuleByRole(true);
+            })
+            .catch((err) => {
+                console.log("Auth Error", err.message)
+            })
+    }
+    useEffect(() => {
+        userAuth();
+    }, [allowedModuleByRole])
 
     return (<Box sx={{ display: 'flex', width: '100vw', height: '100vh', flexDirection: 'row', overflow: 'hidden' }}>
 
-        <SideBar />
+        {tablistCompleted && <SideBar tabList={tabList} />}
 
         <Divider orientation='vertical' sx={{ height: '100%' }} />
 
@@ -61,8 +83,8 @@ export default function BackOfficeHome(props) {
             <Divider />
             {module === "feeGroups" && <FeeGroups />}
             {module === "securities" && <Securities />}
-            {module === "userRoles" && <UserRoleContextProvider><UserRoles /></UserRoleContextProvider>}
-            {module === "users" && <Users />}
+            {!allowedModuleByRole && module === "userRoles" && <UserRoleContextProvider><UserRoles /></UserRoleContextProvider>}
+            {!allowedModuleByRole && module === "users" && <Users />}
             {module === "smtp" && <SMTP />}
             {module === "holdingCost" && <HoldingCostFileUploads />}
 
@@ -99,20 +121,10 @@ export default function BackOfficeHome(props) {
     </Box>);
 
     function SideBar(props) {
-
-
-
-        const tabList = [
-            { label: 'Fee Groups', value: 'feeGroups' },
-            { label: 'Securities', value: 'securities' },
-            { label: 'User Roles', value: 'userRoles' },
-            { label: 'Users', value: 'users' },
-            { label: "SMTP Setup", value: 'smtp' },
-            { label: "Holding Cost", value: 'holdingCost' },
-        ];
+        const { tabList } = props;
+        // ]);
 
         useEffect(() => {
-
         }, []);
 
         function onTabChange(e, tabValue) {
@@ -144,9 +156,7 @@ export default function BackOfficeHome(props) {
             <Box sx={{ paddingLeft: '24px', paddingRight: '24px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <img style={{ width: '80%' }} src={'../companylogo.png'} />
             </Box>
-
             <Divider />
-
             <ThemeProvider theme={sidebarTheme}>
                 <Tabs orientation="vertical" value={tabPanelValue} onChange={onTabChange} aria-label="lab API tabs example">
                     {tabList.map(tab => {

@@ -9,8 +9,7 @@ module.exports = async function (req, res, next) {
         let { userId, field, value } = req.body;
 
         if (field === "role")
-            value = mongoose.Types.ObjectId(value);
-        console.log(value)
+            value = new mongoose.Types.ObjectId(value);
         result = await User.updateOne({ _id: userId }, { $set: { [field]: value } });
 
         if (result) {

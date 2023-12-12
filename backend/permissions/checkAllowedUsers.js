@@ -9,7 +9,9 @@ module.exports = function (req, res, next) {
     try {
         const decrypted = decrypt.decrypt(req.body.payload);
 
-        const { userType, userEmail } = JSON.parse(decrypted);
+        // const { userType, userEmail } = JSON.parse(decrypted);
+        const { userType, userEmail } = req.body;
+        console.log(req.body)
 
         if (userType === "MISA") {
             if (MISAdmin.includes(userEmail)) {

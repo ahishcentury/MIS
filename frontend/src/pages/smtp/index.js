@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Box, IconButton, InputAdornment, TextField, Button, CircularProgress } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-// import { GET_SMTP,UPDATE_SMTP } from '../../../helpers/superAdminApiStrings';
 import axios from 'axios';
-import { UPDATE_SMTP } from '../../helper/apiString';
+import { GET_SMTP, UPDATE_SMTP } from '../../helper/apiString';
+import { message } from "antd";
 
 export default function SMTP(props) {
 
@@ -19,6 +19,7 @@ export default function SMTP(props) {
   const [toggle, setToggle] = useState(false);
   const handleClickShowPassword = () => setShowPassword(!showPassword);
   const handleMouseDownPassword = () => setShowPassword(!showPassword);
+  const [messageApi, contextHolder] = message.useMessage();
 
   function onChange(e) {
     setData(old => {
@@ -30,25 +31,33 @@ export default function SMTP(props) {
   }
 
   function getSMTP() {
-    setIsLoading(false);
-    // setIsLoading(true);
-    // axios.get(GET_SMTP).then(res => {
-    //   setIsLoading(false);
-    //   setData(res.data);
-    //   setIsDataLoaded(true);
-    // }).catch(e => {
-    //   setIsLoading(false);
-    //   console.log(e.message);
-    //   if (e.response.status === 404)
-    //     setIsDataLoaded(true)
-    // })
+    setIsDataLoaded(false);
+    setIsLoading(true);
+    axios.get(GET_SMTP).then(res => {
+      setData({ username: res.data.username, password: "********", name: res.data.name, port: res.data.port, host: res.data.host });
+      setIsLoading(false);
+      setIsDataLoaded(true);
+    }).catch(e => {
+      setIsLoading(false);
+      console.log(e.message);
+      if (e.response.status === 404)
+        setIsDataLoaded(true)
+    })
   };
 
   function updateSMTP() {
     setIsLoading(true);
+    setIsDataLoaded(false);
     axios.post(UPDATE_SMTP, data).then(res => {
       setIsLoading(false);
-      window.location.href = "/mis_home/smtp"
+      setIsDataLoaded(true);
+      messageApi.open({
+        type: "success",
+        content: "SMTP updated Successfully",
+      });
+      // window.location.href = "/mis_home/smtp";
+      getSMTP();
+      data.password = "************";
     }).catch(e => {
       setIsLoading(false);
       console.log(e.message);
@@ -63,6 +72,7 @@ export default function SMTP(props) {
 
 
   return <Box sx={{ width: '100%', height: '100vh' }}>
+    {contextHolder}
     <Box sx={{ paddingLeft: 4, paddingRight: 4 }}>
       <h1>SMTP Server Setup</h1>
     </Box>

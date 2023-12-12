@@ -20,7 +20,7 @@ import Collapse from '@mui/material/Collapse';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import Save from '@mui/icons-material/Save';
 import moment from 'moment';
-import { ADD_NEW_ROLE, DELETE_USER_ROLE, GET_USER_MODULES, GET_USER_ROLES, UPDATE_USER_ROLE_FIELD_PERMISSION, ADD_USER_ROLE_MODULE_PERMISSION, UPDATE_USER_ROLE_MODULE_PERMISSION } from '../../helper/apiString';
+import { ADD_USER_ROLE, DELETE_USER_ROLE, GET_USER_MODULES, GET_USER_ROLES, UPDATE_USER_ROLE_FIELD_PERMISSION, ADD_USER_ROLE_MODULE_PERMISSION, UPDATE_USER_ROLE_MODULE_PERMISSION, UPDATE_USER_ROLE_DATE } from '../../helper/apiString';
 import axios from 'axios';
 import { message } from "antd";
 import userRoleConext from './userRoleContext';
@@ -67,7 +67,7 @@ export default function UserRoles(props) {
 
         setIsCreating(true);
         setIsUserRoleListChanged(true);
-        axios.post(ADD_NEW_ROLE, newRoleValues.current)
+        axios.post(ADD_USER_ROLE, newRoleValues.current)
             .then(res1 => {
                 let roleName = newRoleValues.current.roleName;
                 let roles = {}
@@ -78,6 +78,7 @@ export default function UserRoles(props) {
                         setIsCreating(false);
                         closeCreateRoleDialog();
                         setIsUserRoleListChanged(false);
+                        window.location.reload();
                     }).catch(e => {
                         console.log(e.message);
                     })
@@ -98,17 +99,15 @@ export default function UserRoles(props) {
     }
 
     function deleteUserRole(roleName) {
-        if (window.confirm("Are you sure you want to delete this role?")) {
-            axios.post(DELETE_USER_ROLE, { roleName: roleName })
-                .then(res => {
-                    setIsUserRoleListChanged(true);
-                    setTimeout(() => { setIsUserRoleListChanged(false); }, 500)
+        axios.post(DELETE_USER_ROLE, { roleName: roleName })
+            .then(res => {
+                setIsUserRoleListChanged(false);
+                window.location.reload();
+                // setUserRoles(old => old.filter(r => r.roleName != roleName));
+            }).catch(e => {
+                console.log(e.message);
+            });
 
-                    // setUserRoles(old => old.filter(r => r.roleName != roleName));
-                }).catch(e => {
-                    console.log(e.message);
-                });
-        }
     }
 
     useEffect(() => {
@@ -149,7 +148,6 @@ export default function UserRoles(props) {
                 <LoadingButton onClick={createUserRole} loading={isCreating}>Create</LoadingButton>
             </DialogActions>
         </Dialog>
-
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center', paddingLeft: 4, paddingRight: 4 }}>
             <Box>
@@ -192,13 +190,14 @@ function Row(props) {
 
     const [data, setData] = useState(props.data);
     const { saveChangeData, setSaveChangeData } = props;
-    const [allowedModules, setAllowedModules] = useState([]);
+    let [messageApi, contextHolder] = message.useMessage();
     const [userRoles, setUserRoles] = useState(props.userRoles);
     const [userModules, setUserModules] = useState(props.userModules);
     const [isAccordionOpen, setIsAccordionOpen] = useState(false);
     const [somethingChanged, setSomethingChanged] = useState(false);
+    const [deleteUserRoleDialog, setDeleteUserRoleDialog] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
-    const [modulePermissionObj, getModulePermission] = useState({});
+    let [modulePermissionObj, getModulePermission] = useState({});
 
 
     function toggleAccordion() {
@@ -212,14 +211,18 @@ function Row(props) {
         setSomethingChanged(true);
     }
 
-    function saveChanges(roleName) {
+    function saveChanges(data) {
         setIsSaving(true);
-        modulePermissionObj.roleName = roleName;
+        modulePermissionObj.roleName = data.roleName;
         if (Object.keys(modulePermissionObj).length > 1) {
-            axios.post(UPDATE_USER_ROLE_MODULE_PERMISSION, { data: modulePermissionObj }).then(res => {
+            axios.post(UPDATE_USER_ROLE_MODULE_PERMISSION, { data: modulePermissionObj, _id: data._id }).then(res => {
                 setIsSaving(false);
                 setSomethingChanged(false);
                 modulePermissionObj = {}
+                messageApi.open({
+                    type: "success",
+                    content: "Changes saved successfully",
+                });
             }).catch(err => {
                 setIsSaving(false);
                 console.log(err.message);
@@ -244,28 +247,33 @@ function Row(props) {
                 break;
             }
         }
-        if (rolePermissions.hasOwnProperty("credit")) {
-            if (m["moduleName"] == "credit") {
+        if (rolePermissions.hasOwnProperty("Fee Group")) {
+            if (m["moduleName"] == "Fee Group") {
                 a.push(m);
             }
         }
-        if (rolePermissions.hasOwnProperty("tax")) {
-            if (m["moduleName"] == "tax") {
+        if (rolePermissions.hasOwnProperty("Securities")) {
+            if (m["moduleName"] == "Securities") {
                 a.push(m)
             }
         }
-        if (rolePermissions.hasOwnProperty("funding")) {
-            if (m["moduleName"] == "funding") {
+        if (rolePermissions.hasOwnProperty("User Roles")) {
+            if (m["moduleName"] == "User Roles") {
                 a.push(m)
             }
         }
-        if (rolePermissions.hasOwnProperty("VAT")) {
-            if (m["moduleName"] == "VAT") {
+        if (rolePermissions.hasOwnProperty("Users")) {
+            if (m["moduleName"] == "Users") {
                 a.push(m)
             }
         }
-        if (rolePermissions.hasOwnProperty("products")) {
-            if (m["moduleName"] == "products") {
+        if (rolePermissions.hasOwnProperty("SMTP Setup")) {
+            if (m["moduleName"] == "SMTP Setup") {
+                a.push(m)
+            }
+        }
+        if (rolePermissions.hasOwnProperty("Holding Cost")) {
+            if (m["moduleName"] == "Holding Cost") {
                 a.push(m)
             }
         }
@@ -277,7 +285,22 @@ function Row(props) {
         a = loopToFilterData(m, roleName)
         return a;
     }
+    function closeDeleteRoleDialog() {
+        setDeleteUserRoleDialog(false);
+    }
     return <React.Fragment>
+        <Dialog open={deleteUserRoleDialog}>
+            <DialogContent>
+                <Box mt={2}>
+                    <Typography>Are you sure you want to delete this role?</Typography>
+                </Box>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={closeDeleteRoleDialog}>Cancel</Button>
+                <LoadingButton onClick={() => { props.deleteUserRole(data.roleName); closeDeleteRoleDialog() }}>Delete</LoadingButton>
+            </DialogActions>
+        </Dialog>
+        {contextHolder}
         <TableRow sx={{ "& td": { border: 0 } }}>
             <TableCell sx={{ width: '30px' }}>
                 <IconButton size="small" onClick={toggleAccordion}>
@@ -300,11 +323,11 @@ function Row(props) {
             <TableCell style={{ display: 'flex', justifyContent: 'end' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: 'fit-content' }}>
                     <IconButton size="small" onClick={(e) => {
-                        props.deleteUserRole(data.roleName);
+                        setDeleteUserRoleDialog(true)
                     }}>
                         <DeleteOutline size="small" />
                     </IconButton>
-                    <IconButton disabled={!somethingChanged} onClick={() => saveChanges(data.roleName)}>
+                    <IconButton disabled={!somethingChanged} onClick={() => saveChanges(data)}>
                         <Save size="small" />
                     </IconButton>
                 </Box>
@@ -317,12 +340,13 @@ function Row(props) {
                     {
 
                         userModules.map(m => {
+                            // { console.log(m) }
                             return <ModuleAccessComponent
                                 key={m.key}
                                 reRenderPage={() => {
-                                    console.log("Rendering now");
+                                    // console.log("Rendering now");
                                     setSomethingChanged(true);
-                                    console.log("executing now");
+                                    // console.log("executing now");
                                 }}
                                 handleModuleAccessChange={handleModuleAccessChange}
                                 selectedRole={data}
