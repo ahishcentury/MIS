@@ -10,9 +10,8 @@ module.exports = async function (req, res) {
         if (data.acknowledged) {
             let userRole = await UserRole.updateOne({ _id: req.body["_id"] }, { $set: { updatedAt: new Date().toISOString() } });
             if (userRole) {
-                res.json(userRole);
+                console.log(userRole);
             }
-            console.log(data);
         }
         else {
             console.log("Data not updated");

@@ -58,8 +58,8 @@ export default function Home(props) {
         axios.post(CHECK_ALLOWED_USERS, { userType: "MISA", userEmail: "mumshad@century.ae" })
             .then((res) => {
                 if (!tablistCompleted && !allowedModuleByRole) {
-                    tabList.push({ label: 'User Roles', value: 'userRoles' })
-                    tabList.push({ label: 'Users', value: 'users' })
+                    tabList.push({ label: 'User Roles', value: 'userRoles' });
+                    tabList.push({ label: 'Users', value: 'users' });
                 }
                 setTablistCompleted(true);
                 // setAllowedModuleByRole(true);
@@ -83,8 +83,8 @@ export default function Home(props) {
             <Divider />
             {module === "feeGroups" && <FeeGroups />}
             {module === "securities" && <Securities />}
-            {!allowedModuleByRole && module === "userRoles" && <UserRoleContextProvider><UserRoles /></UserRoleContextProvider>}
-            {!allowedModuleByRole && module === "users" && <Users />}
+            {module === "userRoles" && <UserRoleContextProvider><UserRoles /></UserRoleContextProvider>}
+            {module === "users" && <Users />}
             {module === "smtp" && <SMTP />}
             {module === "holdingCost" && <HoldingCostFileUploads />}
 
@@ -122,7 +122,6 @@ export default function Home(props) {
 
     function SideBar(props) {
         const { tabList } = props;
-        // ]);
 
         useEffect(() => {
         }, []);

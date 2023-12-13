@@ -92,6 +92,8 @@ export default function UserRoles(props) {
                         content: "User Role Already Exist",
                     });
                     setCreateRoleDialogOpen(false);
+                    setTimeout(() => { }, 1000)
+                    window.location.reload();
                 }
                 setIsCreating(false);
 

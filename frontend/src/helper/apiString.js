@@ -54,3 +54,5 @@ export const DELETE_USER = BASE_URL + "/users/deleteUser";
 
 export const UPDATE_USER_INFO = BASE_URL + "/users/updateUserInfo";
 
+export const GET_ROLE_BASE_TAB_LIST = BASE_URL + "/users/getRoleBaseTabList";
+

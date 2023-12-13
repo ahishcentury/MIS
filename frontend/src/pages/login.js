@@ -43,6 +43,7 @@ export default function Login(props) {
                 if (accounts.length == 0) {
                 } else {
                     checkAuthorization(accounts[0].username);
+                    //GENERATE JWT TOKEN WITH USER INFO USERTYPE & USEREMAIL
                 }
             })
             .catch((e) => {
@@ -93,7 +94,7 @@ export default function Login(props) {
                 logout();
             });
     }
-
+    
     useEffect(() => {
         // getPublicKey();
     }, []);

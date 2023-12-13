@@ -29,6 +29,7 @@ const addUserRoleModulePermission = require("../controller/user_role/addUserRole
 const createUser = require("../controller/users/createUser");
 const deleteUser = require("../controller/users/deleteUser");
 const updateUserInfo = require("../controller/users/updateUserInfo");
+const getRoleBaseTabList = require("../controller/general/getRoleBaseTabList");
 const router = express.Router();
 
 router.get("/getUsers", getUsers);
@@ -86,6 +87,10 @@ router.post("/getUsers", getUsers);
 router.post("/deleteUser", deleteUser);
 
 router.post("/updateUserInfo", updateUserInfo);
+
+router.post("/getRoleBaseTabList", getRoleBaseTabList);
+
+router.post("/getRoleBaseTabList", getRoleBaseTabList);
 
 router.get("/getPublicKey", function (req, res, next) {
     res.json(ENCODED_PUBLIC_KEY);
