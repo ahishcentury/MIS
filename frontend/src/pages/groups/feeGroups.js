@@ -2,7 +2,7 @@ import { useContext, useRef, useState, useEffect, createContext } from "react";
 import { Table, Space } from "antd";
 import { Box, Select, TableContainer, TableHead, LinearProgress, TableBody, TableRow, TableColumn, TableCell, Slider, FormHelperText, Tabs, Tab, Stepper, Step, StepLabel, Button, Paper, Container, Grid, Divider, TextField, Typography, Dialog, DialogActions, DialogContent, CircularProgress, MenuItem, FormControl, InputLabel, ToggleButtonGroup, ToggleButton, Stack, DialogTitle, Chip } from "@mui/material";
 import { CURRENCIES } from "../currencies";
-import { GET_GROUPS, GET_GROUP_SYMBOL_CONFIGURATION, GET_GROUP_COMMISSION_CONFIGURATION } from "../../helper/apiString";
+import { GET_GROUPS_MASTER, GET_GROUP_SYMBOL_CONFIGURATION, GET_GROUP_COMMISSION_CONFIGURATION } from "../../helper/apiString";
 import axios from 'axios';
 import AppContext from "../../AppContext";
 import { DataGrid } from "@mui/x-data-grid";
@@ -51,11 +51,15 @@ export default function FeeGroups(props) {
     const [symbolViewDetails, setSymbolViewDetails] = useState(false);
     const [commissionViewDetails, setCommissionViewDetails] = useState(false);
     const [noDataFoundDialog, setNoDataFoundDialog] = useState(false);
+    const allowedFields = useRef({});
+    let arr = [];
 
     function getGroups() {
       setIsLoading(true);
-      axios.get(GET_GROUPS).then((res) => {
-        setGroups(res.data);
+      // axios.get(GET_GROUPS, { headers: { Authorization: "Bearer " + localStorage.getItem("userToken") } }).then((res) => {
+      axios.get(GET_GROUPS_MASTER).then((res) => {
+        setGroups(res.data.groupData);
+        allowedFields.current = res.data.allowedFields;
         setIsLoading(false);
       }).catch((err) => {
         console.log(err.message);
@@ -92,41 +96,52 @@ export default function FeeGroups(props) {
     useEffect(() => {
       getGroups();
     }, []);
-
-    let columns = [
-      { title: "Group Name", dataIndex: "groupName" },
-      { title: "Environment Type", dataIndex: "envType", render: (x) => <Space style={{ width: 150 }}>{x}</Space> },
-      { title: "Currency", dataIndex: "currency" },
-      { title: "Platform", dataIndex: "platfrom" },
-      { title: "Leverage", dataIndex: "leverage" },
-      { title: "Margin Call Level", dataIndex: "maringCall" },
-      { title: "Margin Stopup", dataIndex: "marginStopUp" },
-      { title: "Margin Mode", dataIndex: "maringMode" },
-      {
-        title: "Action",
-        render: (text, record) => (
-          <Box sx={{ width: "100%" }}>
-            <Button variant="contained" onClick={() => { getSymbolOfGroup(record["groupName"]); }}>
-              {"View Symbol"}
-            </Button>
-            {!isSymbolLoading && symbolsOfGroup.length != 0 && <SymbolsDetailView symbolViewDetails={symbolViewDetails} setSymbolViewDetails={setSymbolViewDetails} symbolsOfGroup={symbolsOfGroup} />}
-            {noDataFoundDialog && <NoDataFoundDialog noDataFoundDialog={noDataFoundDialog} setNoDataFoundDialog={setNoDataFoundDialog}></NoDataFoundDialog>}
-            <Button variant="contained" onClick={() => { getCommissionOfGroup(record["groupName"]) }}>
-              {"View Commission"}
-            </Button>
-            {!isCommissionLoading && commissionOfGroup.length != 0 && <CommissionDetailView commissionViewDetails={commissionViewDetails} setCommissionViewDetails={setCommissionViewDetails} commissionOfGroup={commissionOfGroup} />}
-            {noDataFoundDialog && <NoDataFoundDialog noDataFoundDialog={noDataFoundDialog} setNoDataFoundDialog={setNoDataFoundDialog}></NoDataFoundDialog>}
-          </Box>
-        ),
+    function getAllowedFields() {
+      let columns = [
+        { title: "Group Name", dataIndex: "groupName" },
+        { title: "Environment Type", dataIndex: "envType", render: (x) => <Space style={{ width: 150 }}>{x}</Space> },
+        { title: "Currency", dataIndex: "currency" },
+        { title: "Platform", dataIndex: "platform" },
+        { title: "Leverage", dataIndex: "leverage" },
+        { title: "Margin Call Level", dataIndex: "marginCall" },
+        { title: "Margin Stopup", dataIndex: "marginStopUp" },
+        { title: "Margin Mode", dataIndex: "marginMode" },
+        {
+          title: "Action",
+          render: (text, record) => (
+            <Box sx={{ width: "100%" }}>
+              <Button variant="contained" onClick={() => { getSymbolOfGroup(record["groupName"]); }}>
+                {"View Symbol"}
+              </Button>
+              {!isSymbolLoading && symbolsOfGroup.length != 0 && <SymbolsDetailView symbolViewDetails={symbolViewDetails} setSymbolViewDetails={setSymbolViewDetails} symbolsOfGroup={symbolsOfGroup} />}
+              {noDataFoundDialog && <NoDataFoundDialog noDataFoundDialog={noDataFoundDialog} setNoDataFoundDialog={setNoDataFoundDialog}></NoDataFoundDialog>}
+              <Button variant="contained" onClick={() => { getCommissionOfGroup(record["groupName"]) }}>
+                {"View Commission"}
+              </Button>
+              {!isCommissionLoading && commissionOfGroup.length != 0 && <CommissionDetailView commissionViewDetails={commissionViewDetails} setCommissionViewDetails={setCommissionViewDetails} commissionOfGroup={commissionOfGroup} />}
+              {noDataFoundDialog && <NoDataFoundDialog noDataFoundDialog={noDataFoundDialog} setNoDataFoundDialog={setNoDataFoundDialog}></NoDataFoundDialog>}
+            </Box>
+          ),
+        }
+      ];
+      for (let i = 0; i < columns.length; ++i) {
+        if (allowedFields.current.hasOwnProperty(columns[i].dataIndex)) {
+          arr.push(columns[i]);
+        }
       }
-    ];
+      if (arr.length != 0)
+        arr.push(columns[8]);
+      return arr;
+    }
+
 
 
     return <Box sx={{ height: '100vh' }}>
       <Box sx={{ paddingLeft: 4 }}>
         <h1>Fee Groups</h1>
       </Box>
-      <Table dataSource={groups} columns={columns} loading={isLoading} />
+      <Table dataSource={groups} columns={getAllowedFields()} loading={isLoading} />
+      {/* arr.length != 0 ? groups : [] */}
     </Box>;
   }
 

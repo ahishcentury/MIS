@@ -7,15 +7,15 @@
 
 let FIELDPERMISSIONS = {
 
-    ["Fee Group"]: {
-        ["group name"]: [0, 0, 0],
-        ["envronment type"]: [0, 0, 0],
+    ["Fee Groups"]: {
+        ["groupName"]: [0, 0, 0],
+        ["envType"]: [0, 0, 0],
         ["currency"]: [0, 0, 0],
         ["platform"]: [0, 0, 0],
         ["leverage"]: [0, 0, 0],
-        ["margin call level"]: [0, 0, 0],
-        ["margin stopup"]: [0, 0, 0],
-        ["margin mode"]: [0, 0, 0],
+        ["marginCall"]: [0, 0, 0],
+        ["marginStopUp"]: [0, 0, 0],
+        ["marginMode"]: [0, 0, 0],
     },
     ["Securities"]: {
         name: [0, 0, 0],

@@ -10,6 +10,7 @@ module.exports = async function (req, res, next) {
     let userRoleModules = null;
     let allowedModuleList = [];
     let userData = await User.find({ email: email });
+    console.log(userData.length)
     if (userData.length != 0) {
       userRoleData = await UserRole.find({ "_id": new ObjectId(userData[0].role) });
       roleName = userRoleData[0].roleName;
@@ -21,16 +22,10 @@ module.exports = async function (req, res, next) {
 
     Object.keys(userRoleModules).forEach(function (key) {
       var val = userRoleModules[key];
-      allowedModuleList.push({ [val["moduleName"]]: val["permission"]["roles"][roleName][0] })
+      allowedModuleList.push({ [val["moduleName"]]: [val["permission"]["roles"][roleName][0], val["permission"]["roles"][roleName][1], val["permission"]["roles"][roleName][2]] })
     });
 
     res.json({ allowedModuleList });
-
-    // if (userRoleData) {
-    //   res.json(userRoleData);
-    // } else {
-    //   res.status(404).end();
-    // }
   } catch (e) {
     res.status(500).end();
   }

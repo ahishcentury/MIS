@@ -18,9 +18,8 @@ import UserRoles from './user_roles';
 import Users from './users';
 import axios from 'axios';
 import { UserRoleContextProvider } from './user_roles/userRoleContext';
-import { CHECK_ALLOWED_USERS } from '../helper/apiString';
-const drawerWidth = 240;
-
+import { CHECK_ALLOWED_USERS, GET_ROLE_BASE_TAB_LIST } from '../helper/apiString';
+import { useLocation } from "react-router-dom";
 
 export default function Home(props) {
     const { window } = props;
@@ -30,15 +29,12 @@ export default function Home(props) {
     const [notifications, setNotifications] = useState([]);
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [tabPanelValue, setTabPanelValue] = useState(module);
-    const [allowedModuleByRole, setAllowedModuleByRole] = useState(false);
-    const [tablistCompleted, setTablistCompleted] = useState(false);
     const toggleButtonStyle = { sx: { textTransform: 'none', color: context.headingColor } };
     let [tabList, setTabList] = useState([
-        { label: 'Fee Groups', value: 'feeGroups' },
-        { label: 'Securities', value: 'securities' },
-        { label: "SMTP Setup", value: 'smtp' },
-        { label: "Holding Cost", value: 'holdingCost' }
+        // { label: "User Roles", value: 'User Roles' },
+        // { label: "Users", value: 'Users' }
     ]);
+    const [modulePermissionData, setModulePermissionData] = useState({});
 
 
     const logout = () => {
@@ -52,17 +48,26 @@ export default function Home(props) {
         context.setSnackbarMsg(false);
     }
 
-
-    const appbarWidth = 80;
     function userAuth() {
-        axios.post(CHECK_ALLOWED_USERS, { userType: "MISA", userEmail: "mumshad@century.ae" })
+        axios.post(CHECK_ALLOWED_USERS, { userType: localStorage.getItem("userType"), userEmail: localStorage.getItem("email") })
             .then((res) => {
-                if (!tablistCompleted && !allowedModuleByRole) {
-                    tabList.push({ label: 'User Roles', value: 'userRoles' });
-                    tabList.push({ label: 'Users', value: 'users' });
-                }
-                setTablistCompleted(true);
-                // setAllowedModuleByRole(true);
+                axios.post(GET_ROLE_BASE_TAB_LIST, { email: localStorage.getItem("email") })
+                    .then((res) => {
+                        let allowedTabList = [];
+                        let modulePermissionObj = {}
+                        let mList = res.data.allowedModuleList;
+                        for (let i = 0; i < mList.length; ++i) {
+                            modulePermissionObj[Object.keys(mList[i])[0]] = mList[i][Object.keys(mList[i])];
+                            if ((mList[i][Object.keys(mList[i])])[0] == 1) {
+                                allowedTabList.push({ label: Object.keys(mList[i])[0], value: Object.keys(mList[i])[0] })
+                            }
+                        }
+                        setTabList(allowedTabList)
+                        setModulePermissionData(modulePermissionObj)
+                    })
+                    .catch((err) => {
+                        console.log("Auth Error", err.message)
+                    })
             })
             .catch((err) => {
                 console.log("Auth Error", err.message)
@@ -70,23 +75,22 @@ export default function Home(props) {
     }
     useEffect(() => {
         userAuth();
-    }, [allowedModuleByRole])
-
+    }, [])
     return (<Box sx={{ display: 'flex', width: '100vw', height: '100vh', flexDirection: 'row', overflow: 'hidden' }}>
 
-        {tablistCompleted && <SideBar tabList={tabList} />}
+        {<SideBar tabList={tabList} />}
 
         <Divider orientation='vertical' sx={{ height: '100%' }} />
 
         <Box sx={{ flex: 1, height: '100%', overflow: 'scroll', boxSizing: 'border-box' }}>
 
             <Divider />
-            {module === "feeGroups" && <FeeGroups />}
-            {module === "securities" && <Securities />}
-            {module === "userRoles" && <UserRoleContextProvider><UserRoles /></UserRoleContextProvider>}
-            {module === "users" && <Users />}
-            {module === "smtp" && <SMTP />}
-            {module === "holdingCost" && <HoldingCostFileUploads />}
+            {module === "Fee Groups" && <FeeGroups />}
+            {module === "Securities" && <Securities />}
+            {module === "User Roles" && <UserRoleContextProvider><UserRoles /></UserRoleContextProvider>}
+            {module === "Users" && <Users modulePermissionData={modulePermissionData["Users"]} />}
+            {module === "SMTP Setup" && <SMTP modulePermissionData={modulePermissionData["SMTP Setup"]} />}
+            {module === "Holding Cost" && <HoldingCostFileUploads />}
 
             <Snackbar
                 open={context.snackbarMsg}
@@ -108,7 +112,7 @@ export default function Home(props) {
             </Snackbar>
 
 
-            {!["theming", "holdingCost", "automations", "users", "registration", "feeGroups", "securities", "userRoles", "approvalStages", "emailDesigner", "legalDocs", "smtp"].includes(module) &&
+            {!["theming", "Holding Cost", "automations", "Users", "registration", "Fee Groups", "Securities", "User Roles", "approvalStages", "emailDesigner", "legalDocs", "SMTP Setup"].includes(module) &&
                 <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                     <Typography variant="h1">404</Typography>
 

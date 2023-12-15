@@ -1,6 +1,6 @@
 let MODULEPERMISSIONS = [
     {
-        moduleName: "Fee Group",
+        moduleName: "Fee Groups",
         permission: { roles: {} }
     },
     {

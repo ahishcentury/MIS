@@ -7,7 +7,7 @@ import { GET_SMTP, UPDATE_SMTP } from '../../helper/apiString';
 import { message } from "antd";
 
 export default function SMTP(props) {
-
+  const { modulePermissionData } = props;
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -107,7 +107,7 @@ export default function SMTP(props) {
           type={showPassword ? "text" : "password"}
           label={"Password"}
         />
-        <Button variant="contained" onClick={updateSMTP} disabled={!somethingChanged}>Save Changes</Button>
+        {modulePermissionData && modulePermissionData[1] == 1 && <Button variant="contained" onClick={updateSMTP} disabled={!somethingChanged}>Save Changes</Button>}
       </Box>
     }
 

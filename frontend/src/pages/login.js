@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { config } from "../helper/config";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { useNavigate } from "react-router-dom";
-import { Paper, Box, Button, CircularProgress } from "@mui/material";
-import { CHECK_ALLOWED_USERS, GET_PUBLIC_KEY, } from "../helper/apiString";
+import { Paper, Box, Button, CircularProgress, TextField } from "@mui/material";
+import { CHECK_ALLOWED_USERS, GET_ACCESS_TOKEN, GET_PUBLIC_KEY, } from "../helper/apiString";
 import { JSEncrypt } from "jsencrypt";
 import axios from "axios";
 import { Buffer } from "buffer";
+const secret = "TUlTU2VjcmV0";
 
 const encrypt = new JSEncrypt();
 
@@ -28,6 +29,7 @@ const logo = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQQAAABOCAMAAADxYpiG
 export default function Login(props) {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [email, setEmail] = useState();
 
     function getPublicKey() {
         setLoading(true);
@@ -83,7 +85,7 @@ export default function Login(props) {
     }
 
     function checkAuthorization(userEmail) {
-        const enc = encrypt.encrypt(JSON.stringify({ userType: "MISA", userEmail }));
+        const enc = encrypt.encrypt(JSON.stringify({ userType: "MISA", email }));
         axios
             .post(CHECK_ALLOWED_USERS, { payload: enc })
             .then((res) => {
@@ -94,13 +96,21 @@ export default function Login(props) {
                 logout();
             });
     }
-    
+
     useEffect(() => {
         // getPublicKey();
+        localStorage.clear();
     }, []);
 
     const login = async () => {
         try {
+            axios.post(GET_ACCESS_TOKEN, { email: email }).then((res) => {
+                localStorage.setItem("userToken", res.data.token);
+                localStorage.setItem("userType", res.data.userType);
+                localStorage.setItem("email", email);
+            }).catch((err) => {
+                console.log(err.message)
+            });
             // const res = await publicClientApplication.loginPopup({
             //     scopes: config.scopes,
             //     prompt: "select_account",
@@ -109,7 +119,7 @@ export default function Login(props) {
             // if (res) {
             //     checkAuthorization(res.account.username);
             // }
-            navigate("/mis_home");
+            navigate("/mis_home/Fee Groups");
         } catch (err) {
             console.log(err.message);
         }
@@ -130,6 +140,7 @@ export default function Login(props) {
                     <img src={logo} alt="brandlogo" />
                 </Box>
                 <h2>MIS Login</h2>
+                <TextField id="outlined-basic" label="Email" variant="outlined" onChange={(e) => setEmail(e.target.value)} sx={{ marginBottom: "5px" }} /><br />
                 {loading && (
                     <Button variant="contained" onClick={login}>
                         Sign In

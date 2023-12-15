@@ -1,5 +1,5 @@
 const MISAdmin = require("../helper/adminUsers");
-const { signAccessToken } = require("../controller/authentication/authUsers");
+const MISBackOffice = require("../helper/backOfficeUser");
 const JSEncrypt = require("nodejs-jsencrypt").default;
 const decrypt = new JSEncrypt();
 const { PRIVATE_KEY } = require("../helper/keys");
@@ -14,11 +14,14 @@ module.exports = async function (req, res, next) {
 
         if (userType === "MISA") {
             if (MISAdmin.includes(userEmail)) {
-                const token = await signAccessToken({
-                    userType: userType
-                });
-                console.log(token);
-                return res.json(token);//previously it is status Code
+                return res.status(200).end();
+            } else {
+                return res.status(401).end();
+            }
+        }
+        else if (userType === "MISB") {
+            if (MISBackOffice.includes(userEmail)) {
+                return res.status(200).end();
             } else {
                 return res.status(401).end();
             }

@@ -3,7 +3,7 @@ import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { Table, Space } from 'antd';
 import { Box, Button, Paper, Dialog, DialogContent, InputLabel, Stack, DialogTitle } from "@mui/material";
 import { CURRENCIES } from "../currencies";
-import { GET_SYMBOLS, IMPORT_SECURITIES_URL } from "../../helper/apiString";
+import { GET_SYMBOLS_MASTER, IMPORT_SECURITIES_URL } from "../../helper/apiString";
 // import { CREATE_SECURITY_URL, GET_SECURITIES_URL, GET_SYMBOLS, IMPORT_SECURITIES_URL } from "../../../helpers/superAdminApiStrings";
 import axios from "axios";
 import TableContainer from '@mui/material/TableContainer';
@@ -25,7 +25,7 @@ export default function Securities(props) {
 
   function getSymbol() {
     setIsLoading(true);
-    axios.get(GET_SYMBOLS).then((res) => {
+    axios.get(GET_SYMBOLS_MASTER).then((res) => {
       setSymbol(res.data);
       setIsLoading(false);
     }).catch((err) => {

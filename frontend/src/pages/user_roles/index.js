@@ -218,13 +218,13 @@ function Row(props) {
         modulePermissionObj.roleName = data.roleName;
         if (Object.keys(modulePermissionObj).length > 1) {
             axios.post(UPDATE_USER_ROLE_MODULE_PERMISSION, { data: modulePermissionObj, _id: data._id }).then(res => {
-                setIsSaving(false);
-                setSomethingChanged(false);
-                modulePermissionObj = {}
                 messageApi.open({
                     type: "success",
                     content: "Changes saved successfully",
                 });
+                setIsSaving(false);
+                setSomethingChanged(false);
+                modulePermissionObj = {}
             }).catch(err => {
                 setIsSaving(false);
                 console.log(err.message);
@@ -249,8 +249,8 @@ function Row(props) {
                 break;
             }
         }
-        if (rolePermissions.hasOwnProperty("Fee Group")) {
-            if (m["moduleName"] == "Fee Group") {
+        if (rolePermissions.hasOwnProperty("Fee Groups")) {
+            if (m["moduleName"] == "Fee Groups") {
                 a.push(m);
             }
         }

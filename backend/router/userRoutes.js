@@ -3,11 +3,11 @@ const getUsers = require("../controller/users/getUsers");
 const addUsers = require("../controller/users/addUser");
 const checkAllowedUsers = require("../permissions/checkAllowedUsers");
 const { ENCODED_PUBLIC_KEY } = require("../helper/keys");
-const getGroups = require("../controller/getGroupMaster");
+const getGroupsMaster = require("../controller/getGroupsMaster");
 const getGroupSymbolConfiguration = require("../controller/getGroupSymbolsConfigurationMaster");
 const getGroupCommissionConfiguration = require("../controller/getGroupCommissionConfigurationMaster");
-const getSymbols = require("../controller/getSymbolMaster");
-const updateSMTP = require("../controller/smtp/updateSmtpDetails");
+const getSymbolsMaster = require("../controller/getSymbolMaster");
+const updateSMTPDetails = require("../controller/smtp/updateSmtpDetails");
 const getSmtpDetails = require("../controller/smtp/getSmtpDetails");
 const uploadSwapMaster = require("../controller/holding_cost/opsHoldingRateUploadMaster");
 const uploadHoldingRateMaster = require("../controller/holding_cost/lpHoldingRateUploadMaster");
@@ -30,23 +30,25 @@ const createUser = require("../controller/users/createUser");
 const deleteUser = require("../controller/users/deleteUser");
 const updateUserInfo = require("../controller/users/updateUserInfo");
 const getRoleBaseTabList = require("../controller/general/getRoleBaseTabList");
+const getAccessToken = require("../permissions/getAccessToken");
+const { verifyAccessToken } = require("../controller/authentication/authUsers");
 const router = express.Router();
 
-router.get("/getUsers", getUsers);
+router.get("/getUsers", verifyAccessToken, getUsers);
 
 router.post("/addUsers", addUsers);
 
-router.get("/getGroups", getGroups);
+router.get("/getGroupsMaster", verifyAccessToken, getGroupsMaster);
 
-router.get("/getSymbols", getSymbols);
+router.get("/getSymbolsMaster", verifyAccessToken, getSymbolsMaster);
 
-router.get("/getSmtpDetails", getSmtpDetails);
+router.get("/getSmtpDetails", verifyAccessToken, getSmtpDetails);
 
-router.post("/updateSmtpDetails", updateSMTP);
+router.post("/updateSmtpDetails", verifyAccessToken, updateSMTPDetails);
 
-router.get("/getGroupSymbolConfiguration/:groupName", getGroupSymbolConfiguration);
+router.get("/getGroupSymbolConfiguration/:groupName", verifyAccessToken, getGroupSymbolConfiguration);
 
-router.get("/getGroupCommissionConfiguration/:groupName", getGroupCommissionConfiguration);
+router.get("/getGroupCommissionConfiguration/:groupName", verifyAccessToken, getGroupCommissionConfiguration);
 
 router.post("/checkAllowedUsers", checkAllowedUsers);
 
@@ -70,7 +72,7 @@ router.post("/addUserRole", addUserRole);
 
 router.get("/getUserRoles", getUserRole);
 
-router.get("/getUserModules", getUserModules);
+router.get("/getUserModules", verifyAccessToken, getUserModules);
 
 router.post("/deleteUserRole", deleteUserRole);
 
@@ -91,6 +93,8 @@ router.post("/updateUserInfo", updateUserInfo);
 router.post("/getRoleBaseTabList", getRoleBaseTabList);
 
 router.post("/getRoleBaseTabList", getRoleBaseTabList);
+
+router.post("/getAccessToken", getAccessToken);
 
 router.get("/getPublicKey", function (req, res, next) {
     res.json(ENCODED_PUBLIC_KEY);

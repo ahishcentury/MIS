@@ -4,9 +4,9 @@ export const CHECK_ALLOWED_USERS = BASE_URL + "/users/checkAllowedUsers";
 
 export const GET_PUBLIC_KEY = BASE_URL + "/users/getPublicKey";
 
-export const GET_GROUPS = BASE_URL + "/users/getGroups";
+export const GET_GROUPS_MASTER = BASE_URL + "/users/getGroupsMaster";
 
-export const GET_SYMBOLS = BASE_URL + "/users/getSymbols";
+export const GET_SYMBOLS_MASTER = BASE_URL + "/users/getSymbolsMaster";
 
 export const IMPORT_SECURITIES_URL = BASE_URL + "/users/importSecurities";
 
@@ -55,4 +55,6 @@ export const DELETE_USER = BASE_URL + "/users/deleteUser";
 export const UPDATE_USER_INFO = BASE_URL + "/users/updateUserInfo";
 
 export const GET_ROLE_BASE_TAB_LIST = BASE_URL + "/users/getRoleBaseTabList";
+
+export const GET_ACCESS_TOKEN = BASE_URL + "/users/getAccessToken";
 
