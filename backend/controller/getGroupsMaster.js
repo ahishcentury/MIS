@@ -6,13 +6,11 @@ const getGroupsMaster = async (req, res) => {
     try {
         const { email, userType } = req.payload;
         let roleName = null;
-        console.log(email, "My Mail")
         let userRoleModulesPermission = null;
         let userData = await userMaster.findOne({ email: email });
         if (userData) {
             roleName = userData.role;
         }
-        console.log(roleName, "Role Name")
         if (roleName != null) {
             userRoleModulesPermission = await UserRole.findById(roleName);
         }
@@ -20,7 +18,7 @@ const getGroupsMaster = async (req, res) => {
         console.log("feeGroupPermissions", feeGroupPermissions);
         let temp = { _id: 1 };
         Object.keys(feeGroupPermissions).forEach(function (key) {
-            if (feeGroupPermissions[key][0] === 1) {
+            if (feeGroupPermissions[key][1] === 1) {
                 temp[key.toString()] = 1;
             }
         });

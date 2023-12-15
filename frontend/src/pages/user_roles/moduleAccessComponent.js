@@ -149,12 +149,12 @@ function CustomField(props) {
             temp.perms[0][selectedModule][label][1] = 1
             temp.perms[0][selectedModule][label][2] = 1
         }
-        else if (item[0] == "Read-Only") {
+        else if (item[0] == "Invisible") {
             temp.perms[0][selectedModule][label][0] = 1
             temp.perms[0][selectedModule][label][1] = 0
             temp.perms[0][selectedModule][label][2] = 0
         }
-        else if (item[0] == "Invisible") {
+        else if (item[0] == "Read-Only") {
             temp.perms[0][selectedModule][label][0] = 0
             temp.perms[0][selectedModule][label][1] = 1
             temp.perms[0][selectedModule][label][2] = 0
