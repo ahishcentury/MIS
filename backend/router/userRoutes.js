@@ -99,7 +99,7 @@ router.post("/getRoleBaseTabList", getRoleBaseTabList);
 
 router.post("/getAccessToken", getAccessToken);
 
-router.get("/getOpenPositionMaster", getOpenPositionMaster);
+router.post("/getOpenPositionMaster", getOpenPositionMaster);
 
 router.get("/getTreeMapData", getTreeMapData);
 

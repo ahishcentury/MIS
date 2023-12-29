@@ -2,40 +2,37 @@ const OpenPosition = require("../../schemas/openPosition");
 let path = require("path");
 const fs = require("fs");
 const getOpenPositionMaster = async (req, res, next) => {
-    // const { filterByClient ,  filterByPositionDirection , filterBySymbol} = req.body;
-    const filterByClient = null;
-    const filterByPositionDirection = null;
-    const filterBySymbol = null;
-    // const filterByClient = 500129;
-    // const filterByPositionDirection = "BUY";
-    // const filterBySymbol = "RIVN US";
+    console.log(req.body);
+    const { filterByClient, filterByPositionDirection, filterBySymbol } = req.body;
+    console.log(filterByPositionDirection);
+    console.log(filterBySymbol);
     let searchQuery = {}
     try {
-        if (filterByClient != null) {
+        if (filterByClient != "") {
             searchQuery.loginid = filterByClient
-            if (filterByPositionDirection != null) {
+            if (filterByPositionDirection != "") {
                 searchQuery.type = filterByPositionDirection;
             }
-            if (filterBySymbol != null) {
+            if (filterBySymbol != "") {
                 searchQuery.symbol = filterBySymbol;
             }
         }
 
-        else if (filterByPositionDirection != null) {
+        else if (filterByPositionDirection != "") {
             searchQuery.type = filterByPositionDirection;
-            if (filterByClient != null) {
+            if (filterByClient != "") {
                 searchQuery.loginid = filterByClient
             }
-            if (filterBySymbol != null) {
+            if (filterBySymbol != "") {
                 searchQuery.symbol = filterBySymbol;
             }
         }
-        else if (filterBySymbol != null) {
+        else if (filterBySymbol != "") {
             searchQuery.symbol = filterBySymbol;
-            if (filterByPositionDirection != null) {
+            if (filterByPositionDirection != "") {
                 searchQuery.type = filterByPositionDirection;
             }
-            if (filterByClient != null) {
+            if (filterByClient != "") {
                 searchQuery.loginid = filterByClient
             }
         }
@@ -43,9 +40,9 @@ const getOpenPositionMaster = async (req, res, next) => {
             searchQuery = {}
         }
         let currencyMap = JSON.parse(fs.readFileSync(path.join(__dirname, "../../helper/currencyMap.json")));
-        let jsFunctionBody = `function(profitCur,currencyMap){
+        let jsFunctionBody = `function(profitCurSymbol,currencyMap){
             try{
-              return currencyMap[profitCur]
+              return currencyMap[profitCurSymbol]
             }catch(e){
               return 1;
             }
