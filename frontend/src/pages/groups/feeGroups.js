@@ -1,4 +1,4 @@
-import { useContext, useRef, useState, useEffect, createContext } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { Table, Space } from "antd";
 import { Box, Select, TableContainer, TableHead, LinearProgress, TableBody, TableRow, TableColumn, TableCell, Slider, FormHelperText, Tabs, Tab, Stepper, Step, StepLabel, Button, Paper, Container, Grid, Divider, TextField, Typography, Dialog, DialogActions, DialogContent, CircularProgress, MenuItem, FormControl, InputLabel, ToggleButtonGroup, ToggleButton, Stack, DialogTitle, Chip } from "@mui/material";
 import { CURRENCIES } from "../currencies";
@@ -6,11 +6,13 @@ import { GET_GROUPS_MASTER, GET_GROUP_SYMBOL_CONFIGURATION, GET_GROUP_COMMISSION
 import axios from 'axios';
 import AppContext from "../../AppContext";
 import { DataGrid } from "@mui/x-data-grid";
+import UserRoleConext from "../user_roles/userRoleContext";
 
 export default function FeeGroups(props) {
 
   const [groupFormVisible, setGroupFormVisible] = useState(false);
   const context = useContext(AppContext);
+  const userContext = useContext(UserRoleConext);
 
 
   function showAddGroupForm() {
@@ -24,7 +26,7 @@ export default function FeeGroups(props) {
   return <Box sx={{ position: 'relative' }}>
     <Box sx={{ display: 'flex', gap: '12px', alignItems: 'center', width: 'fit-content', position: 'absolute', bottom: 12, left: 12, zIndex: 10 }}>
 
-      <Button variant={'contained'} size="small" onClick={showAddGroupForm}>Create New</Button>
+      {/* <Button variant={'contained'} size="small" onClick={showAddGroupForm}>Create New</Button> */}
 
     </Box>
     <GroupsList />
@@ -110,10 +112,18 @@ export default function FeeGroups(props) {
           title: "Action",
           render: (text, record) => (
             <Box sx={{ width: "100%" }}>
-              <Button variant="contained" onClick={() => { getSymbolOfGroup(record["groupName"]); }}>
+              <Button variant="contained"
+                // sx={{
+                // bgcolor: "#ffd700", color: "black", fontWeight: "bold",
+                // '&:hover': {
+                //   backgroundColor: 'black',
+                //   color: "white",
+                // },}}
+                onClick={() => { getSymbolOfGroup(record["groupName"]); }}>
                 {"View Symbol"}
               </Button>
               {!isSymbolLoading && symbolsOfGroup.length != 0 && <SymbolsDetailView symbolViewDetails={symbolViewDetails} setSymbolViewDetails={setSymbolViewDetails} symbolsOfGroup={symbolsOfGroup} />}
+              <span style={{ marginRight: "5px" }}></span>
               {noDataFoundDialog && <NoDataFoundDialog noDataFoundDialog={noDataFoundDialog} setNoDataFoundDialog={setNoDataFoundDialog}></NoDataFoundDialog>}
               <Button variant="contained" onClick={() => { getCommissionOfGroup(record["groupName"]) }}>
                 {"View Commission"}

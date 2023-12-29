@@ -62,7 +62,6 @@ export default function Users(props) {
     function getUsersRole() {
         axios.get(GET_USER_ROLES).then(res => {
             setRoles(res.data);
-            console.log(res.data)
             setRolesForSelectTag(res.data);
         }).catch(e => {
             console.log(e.message);
@@ -242,6 +241,6 @@ function ActionsComponent({ _id, modulePermissionData }) {
         {executingMsg && <Loader msg="" size={16} marginTop={5} />}
         {modulePermissionData && modulePermissionData[2] == 1 && <><Tooltip title="Remove user permanently"><a onClick={removeUser}><DeleteOutlined /></a></Tooltip>
             <Divider type="vertical" /></>}
-        {modulePermissionData && modulePermissionData[1] && <Tooltip title="Edit details of user"><a onClick={editValues}><EditOutlined /></a></Tooltip>}
+        {modulePermissionData && modulePermissionData[1] ? <Tooltip title="Edit details of user"><a onClick={editValues}><EditOutlined /></a></Tooltip> : <></>}
     </Space>
 }

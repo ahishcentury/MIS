@@ -6,5 +6,6 @@ module.exports = async function (req, res) {
     if (data) {
         return res.json("User deleted Successfully");
     }
+
     return res.json("ERROR");
 }

@@ -18,25 +18,25 @@ let FIELDPERMISSIONS = {
         ["marginMode"]: [0, 0, 0],
     },
     ["Securities"]: {
-        name: [0, 0, 0],
+        symbolName: [0, 0, 0],
         path: [0, 0, 0],
         description: [0, 0, 0],
         sector: [0, 0, 0],
-        ["min lot size"]: [0, 0, 0],
-        ["max lot size"]: [0, 0, 0],
-        ["step interval"]: [0, 0, 0],
-        ["position limit"]: [0, 0, 0],
-        ["stop level"]: [0, 0, 0],
-        ["base currency"]: [0, 0, 0],
-        ["profit curreny"]: [0, 0, 0],
-        ["margin curreny"]: [0, 0, 0],
-        ["commission fee"]: [0, 0, 0],
-        ["spread fee"]: [0, 0, 0],
+        ["minLotSize"]: [0, 0, 0],
+        ["maxLotSize"]: [0, 0, 0],
+        ["stepInterval"]: [0, 0, 0],
+        ["positionLimit"]: [0, 0, 0],
+        ["stopLevel"]: [0, 0, 0],
+        ["baseCur"]: [0, 0, 0],
+        ["profitCur"]: [0, 0, 0],
+        ["marginCur"]: [0, 0, 0],
+        ["commissionFee"]: [0, 0, 0],
+        ["spreadFee"]: [0, 0, 0],
         margin: [0, 0, 0],
-        ["spread def"]: [0, 0, 0],
-        ["contract size"]: [0, 0, 0],
-        ["swap short"]: [0, 0, 0],
-        ["swap long"]: [0, 0, 0]
+        ["spreadDef"]: [0, 0, 0],
+        ["contractSize"]: [0, 0, 0],
+        ["swapShort"]: [0, 0, 0],
+        ["swapLong"]: [0, 0, 0]
     },
     ["User Roles"]: {
         ["role name"]: [0, 0, 0],
@@ -58,7 +58,12 @@ let FIELDPERMISSIONS = {
         login: [0, 0, 0],
         password: [0, 0, 0]
     },
-    ["Holding Cost"]: {}
+    ["Holding Cost"]: {
+        _id: [1, 1, 1]
+    },
+    ["Open Position"]: {
+        loginid: [1, 1, 1]
+    }
 };
 
 module.exports = FIELDPERMISSIONS;

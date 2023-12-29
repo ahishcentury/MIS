@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { config } from "../helper/config";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { useNavigate } from "react-router-dom";
@@ -99,6 +99,7 @@ export default function Login(props) {
 
     useEffect(() => {
         // getPublicKey();
+
         localStorage.clear();
     }, []);
 
@@ -108,6 +109,20 @@ export default function Login(props) {
                 localStorage.setItem("userToken", res.data.token);
                 localStorage.setItem("userType", res.data.userType);
                 localStorage.setItem("email", email);
+                // axios.interceptors.request.use(
+                //     config => {
+                //         const token = localStorage.getItem("userToken")
+                //         if (token) {
+                //             config.headers['Authorization'] = 'Bearer ' + token
+                //         }
+                //         config.headers['Content-Type'] = 'application/json';
+                //         return config
+                //     },
+                //     error => {
+                //         Promise.reject(error)
+                //     }
+                // );
+                navigate("/mis_home/Fee Groups");
             }).catch((err) => {
                 console.log(err.message)
             });
@@ -119,7 +134,7 @@ export default function Login(props) {
             // if (res) {
             //     checkAuthorization(res.account.username);
             // }
-            navigate("/mis_home/Fee Groups");
+
         } catch (err) {
             console.log(err.message);
         }

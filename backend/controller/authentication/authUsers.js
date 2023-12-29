@@ -11,7 +11,7 @@ module.exports = {
             const options = {
                 issuer: "century.mis.ae",
                 audience: obj.userType.toString(),
-                expiresIn: "10m",
+                expiresIn: "60m",
             };
             JWT.sign(payload, secret, options, (err, token) => {
                 if (err) reject(err);
@@ -26,7 +26,7 @@ module.exports = {
             };
             const secret = process.env.REFRESH_TOKEN_SECRET;
             const options = {
-                expiresIn: "10m",
+                expiresIn: "60m",
                 issuer: "century.mis.ae",
                 audience: userId,
             };

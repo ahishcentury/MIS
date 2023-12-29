@@ -58,3 +58,7 @@ export const GET_ROLE_BASE_TAB_LIST = BASE_URL + "/users/getRoleBaseTabList";
 
 export const GET_ACCESS_TOKEN = BASE_URL + "/users/getAccessToken";
 
+export const GET_OPEN_POSITION_MASTER = BASE_URL + "/users/getOpenPositionMaster";
+
+export const GET_TREE_MAP_DATA = BASE_URL + "/users/getTreeMapData";
+

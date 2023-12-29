@@ -30,5 +30,5 @@ const symbolMasterSchema = new Schema(
     }
 );
 
-const symbolMaster = mongoose.model('symbolmanagements', symbolMasterSchema);
+const symbolMaster = mongoose.model('symbolmaster', symbolMasterSchema);
 module.exports = symbolMaster;

@@ -17,9 +17,10 @@ import HoldingCostFileUploads from './holding_cost';
 import UserRoles from './user_roles';
 import Users from './users';
 import axios from 'axios';
-import { UserRoleContextProvider } from './user_roles/userRoleContext';
 import { CHECK_ALLOWED_USERS, GET_ROLE_BASE_TAB_LIST } from '../helper/apiString';
 import { useLocation } from "react-router-dom";
+import UserRoleConext from "./user_roles/userRoleContext";
+import OpenPositionHome from './open_positions/openPositionHome';
 
 export default function Home(props) {
     const { window } = props;
@@ -34,13 +35,15 @@ export default function Home(props) {
         // { label: "User Roles", value: 'User Roles' },
         // { label: "Users", value: 'Users' }
     ]);
+    const userContext = useContext(UserRoleConext);
     const [modulePermissionData, setModulePermissionData] = useState({});
 
 
     const logout = () => {
-        if (localStorage.getItem("token")) {
+        if (localStorage.getItem("userToken")) {
             localStorage.clear();
-            window.location.reload();
+            navigate("/")
+            // window.location.reload();
         }
     }
 
@@ -62,11 +65,11 @@ export default function Home(props) {
                                 allowedTabList.push({ label: Object.keys(mList[i])[0], value: Object.keys(mList[i])[0] })
                             }
                         }
-                        setTabList(allowedTabList)
-                        setModulePermissionData(modulePermissionObj)
+                        setTabList(allowedTabList);
+                        setModulePermissionData(modulePermissionObj);
                     })
                     .catch((err) => {
-                        console.log("Auth Error", err.message)
+                        console.log("Auth Error", err.message);
                     })
             })
             .catch((err) => {
@@ -74,7 +77,9 @@ export default function Home(props) {
             })
     }
     useEffect(() => {
+        // userContext.setName("Qasim")
         userAuth();
+        console.log("User Auth Term")
     }, [])
     return (<Box sx={{ display: 'flex', width: '100vw', height: '100vh', flexDirection: 'row', overflow: 'hidden' }}>
 
@@ -87,7 +92,8 @@ export default function Home(props) {
             <Divider />
             {module === "Fee Groups" && <FeeGroups />}
             {module === "Securities" && <Securities />}
-            {module === "User Roles" && <UserRoleContextProvider><UserRoles /></UserRoleContextProvider>}
+            {module === "User Roles" && <UserRoles />}
+            {module === "Open Position" && <OpenPositionHome />}
             {module === "Users" && <Users modulePermissionData={modulePermissionData["Users"]} />}
             {module === "SMTP Setup" && <SMTP modulePermissionData={modulePermissionData["SMTP Setup"]} />}
             {module === "Holding Cost" && <HoldingCostFileUploads />}
@@ -112,7 +118,7 @@ export default function Home(props) {
             </Snackbar>
 
 
-            {!["theming", "Holding Cost", "automations", "Users", "registration", "Fee Groups", "Securities", "User Roles", "approvalStages", "emailDesigner", "legalDocs", "SMTP Setup"].includes(module) &&
+            {!["theming", "Holding Cost", "automations", "Open Position", "Users", "registration", "Fee Groups", "Securities", "User Roles", "approvalStages", "emailDesigner", "legalDocs", "SMTP Setup"].includes(module) &&
                 <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                     <Typography variant="h1">404</Typography>
 
@@ -157,7 +163,7 @@ export default function Home(props) {
 
         return <Box sx={sideBarStyleProps}>
             <Box sx={{ paddingLeft: '24px', paddingRight: '24px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <img style={{ width: '80%' }} src={'../companylogo.png'} />
+                <img style={{ width: '80%' }} src={'https://d10t455z86w23i.cloudfront.net/public/uploads/settings/company_logo_2022__1697520422.png'} />
             </Box>
             <Divider />
             <ThemeProvider theme={sidebarTheme}>
@@ -239,7 +245,7 @@ export default function Home(props) {
                         </Box>
 
                         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center', alignItems: 'center' }}>
-                            <Typography variant={'h6'}>{"Super Admin"}</Typography>
+                            <Typography variant={'h6'}>{localStorage.getItem("userType") == "MISA" ? "Admin" : localStorage.getItem("userType") == "MISB" ? "Back Office User" : ""}</Typography>
                             <Button variant="outlined" onClick={logout}>Logout</Button>
                         </Box>
                     </Box>

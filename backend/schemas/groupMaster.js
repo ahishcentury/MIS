@@ -12,12 +12,11 @@ const groupMasterSchema = new Schema(
         maringCall: { type: Number, required: true },
         marginStopUp: { type: Number, required: true },
         leverage: { type: Number, required: true },
-
     },
     {
         timestamps: true
     }
 );
 
-const groupMaster = mongoose.model('groupmanagements', groupMasterSchema);
+const groupMaster = mongoose.model('groupmasters', groupMasterSchema);
 module.exports = groupMaster;

@@ -19,13 +19,19 @@ module.exports = async function (req, res, next) {
     if (roleName != null) {
       userRoleModules = await UserModule.find({});
     }
-
-    Object.keys(userRoleModules).forEach(function (key) {
+    console.log(roleName, "Role Name")
+    Object.keys(userRoleModules).map(function (key) {
       var val = userRoleModules[key];
-      allowedModuleList.push({ [val["moduleName"]]: [val["permission"]["roles"][roleName][0], val["permission"]["roles"][roleName][1], val["permission"]["roles"][roleName][2]] })
-    });
 
-    res.json({ allowedModuleList });
+      val = (JSON.stringify(val))
+      val = (JSON.parse(val))
+      let arr = Object.keys(val)
+      if (arr.includes("permission")) {
+        if (val["permission"]["roles"][roleName] != undefined)
+          allowedModuleList.push({ [val["moduleName"]]: [val["permission"]["roles"][roleName][0], val["permission"]["roles"][roleName][1], val["permission"]["roles"][roleName][2]] })
+      }
+    });
+    return res.json({ allowedModuleList });
   } catch (e) {
     res.status(500).end();
   }

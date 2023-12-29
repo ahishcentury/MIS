@@ -24,7 +24,6 @@ function getLocale() {
 }
 
 export function AppContextProvider(props) {
-
     const [globalInputFieldVariant, setGlobalInputFieldVariant] = useState("outlined");
     const [headingColor, setHeadingColor] = useState("#ffd700");
     const [lang, setLang] = useState(getLang());
@@ -47,8 +46,6 @@ export function AppContextProvider(props) {
     const [BOClientChange, setBOClientChange] = useState(false);
     const [BOFundingChange, setBOFundingChange] = useState(false);
     const [BOTicketChange, setBOTicketChange] = useState(false);
-
-
 
     const [perms, setPerms] = useState(false);
     const [stages, setStages] = useState(false);

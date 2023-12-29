@@ -22,27 +22,18 @@ export default function Securities(props) {
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [symbol, setSymbol] = useState();
-
+  const allowedFields = useRef({});
+  let arr = [];
   function getSymbol() {
     setIsLoading(true);
     axios.get(GET_SYMBOLS_MASTER).then((res) => {
-      setSymbol(res.data);
+      setSymbol(res.data.symbolData);
+      allowedFields.current = res.data.allowedFields;
       setIsLoading(false);
     }).catch((err) => {
       console.log(err.message);
     });
   }
-
-  // function getSecurities() {
-  //   setIsLoading(true);
-  //   axios.get(GET_SECURITIES_URL).then(res => {
-  //     setIsLoading(false);
-  //     setItems(res.data);
-  //   }).catch(err => {
-  //     setIsLoading(false);
-  //     console.log(err);
-  //   })
-  // }
 
   const context = useContext(AppContext);
 
@@ -67,29 +58,35 @@ export default function Securities(props) {
     //   getSecurities();
     getSymbol();
   }, [])
-
-  const columns = [
-    { title: "Name", dataIndex: "symbolName" },
-    { title: "Path", dataIndex: "path", render: (x) => <Space style={{ width: 150 }}>{x}</Space> },
-    { title: "Description", dataIndex: "description", render: (x) => <Space style={{ width: 300 }}>{x}</Space> },
-    { title: "Sector", dataIndex: "sector" },
-    { title: "Min Lot Size", dataIndex: "min", render: (x) => <Space style={{ width: 100 }}>{x.toLocaleString()}</Space> },
-    { title: "Max Lot Size", dataIndex: "max", render: (x) => <Space style={{ width: 100 }}>{x.toLocaleString()}</Space> },
-    { title: "Step Interval", dataIndex: "step", render: (x) => <Space style={{ width: 100 }}>{x.toLocaleString()}</Space> },
-    { title: "Position Limit", dataIndex: "limit", render: (x) => <Space style={{ width: 100 }}>{x.toLocaleString()}</Space> },
-    { title: "Stop Level", dataIndex: "stopLevel" },
-    { title: "Base Currency", dataIndex: "baseCurrency" },
-    { title: "Profit Currency", dataIndex: "profitCurrency" },
-    { title: "Margin Currency", dataIndex: "marginCurrency" },
-    { title: "Commission Fee", dataIndex: "commission" },
-    { title: "Spread Fee", dataIndex: "spread" },
-    { title: "Margin", dataIndex: "margin" },
-    { title: "Spread Def", dataIndex: "spreadDef" },
-    { title: "Contract Size", dataIndex: "contractSize" },
-    { title: "Swap Short", dataIndex: "swapShort" },
-    { title: "Swap Long", dataIndex: "swapLong" },
-
-  ]
+  function getAllowedFields() {
+    let columns = [
+      { title: "Name", dataIndex: "symbolName" },
+      { title: "Path", dataIndex: "path", render: (x) => <Space style={{ width: 150 }}>{x}</Space> },
+      { title: "Description", dataIndex: "description", render: (x) => <Space style={{ width: 300 }}>{x}</Space> },
+      { title: "Sector", dataIndex: "sector" },
+      { title: "Min Lot Size", dataIndex: "minLotSize", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
+      { title: "Max Lot Size", dataIndex: "maxLotSize", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
+      { title: "Step Interval", dataIndex: "stepInterval", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
+      { title: "Position Limit", dataIndex: "positionLimit", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
+      { title: "Stop Level", dataIndex: "stopLevel" },
+      { title: "Base Currency", dataIndex: "baseCur" },
+      { title: "Profit Currency", dataIndex: "profitCur" },
+      { title: "Margin Currency", dataIndex: "marginCur" },
+      { title: "Commission Fee", dataIndex: "commissionFee" },
+      { title: "Spread Fee", dataIndex: "spreadFee" },
+      { title: "Margin", dataIndex: "margin" },
+      { title: "Spread Def", dataIndex: "spreadDef" },
+      { title: "Contract Size", dataIndex: "contractSize" },
+      { title: "Swap Short", dataIndex: "swapShort" },
+      { title: "Swap Long", dataIndex: "swapLong" },
+    ];
+    for (let i = 0; i < columns.length; ++i) {
+      if (allowedFields.current.hasOwnProperty(columns[i].dataIndex)) {
+        arr.push(columns[i]);
+      }
+    }
+    return arr;
+  }
 
   return <Box sx={{ position: 'relative' }}>
     <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center', paddingLeft: 4, paddingRight: 4 }}>
@@ -103,7 +100,7 @@ export default function Securities(props) {
       </Box>
     </Box>
 
-    <Table dataSource={symbol} columns={columns} loading={isLoading} />
+    <Table dataSource={symbol} columns={getAllowedFields()} loading={isLoading} />
     {/* <AddSecurityDialog open={addSecurityDialogOpen} onClose={closeAddSecurityDialog} onAddSuccess={() => { 'SUCCESS' }} /> */}
 
     <Dialog maxWidth={"xl"} open={importDialogVisible} fullWidth>

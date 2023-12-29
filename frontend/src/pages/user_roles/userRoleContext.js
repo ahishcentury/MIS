@@ -1,10 +1,12 @@
 import { createContext, useState } from "react";
-const userRoleConext = createContext({})
-export function UserRoleContextProvider(useProps) {
-    const [module, setModule] = useState([]);
-    const context = { module, setModule };
-    return <userRoleConext.Provider value={context}>
-        {useProps.children}
-    </userRoleConext.Provider>
+const UserRoleConext = createContext({})
+export function UserRoleContextProvider({ children }) {
+    const [name, setName] = useState("Mumshad ")
+    const [age, setAge] = useState("Jawad")
+    const [dialog, setDialog] = useState(false)
+    const context = { name, setName, age, setAge, dialog, setDialog }
+    return <UserRoleConext.Provider value={context}>
+        {children}
+    </UserRoleConext.Provider>
 }
-export default userRoleConext;
+export default UserRoleConext;

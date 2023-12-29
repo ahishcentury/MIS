@@ -32,6 +32,9 @@ const updateUserInfo = require("../controller/users/updateUserInfo");
 const getRoleBaseTabList = require("../controller/general/getRoleBaseTabList");
 const getAccessToken = require("../permissions/getAccessToken");
 const { verifyAccessToken } = require("../controller/authentication/authUsers");
+const getOpenPositionMaster = require("../controller/open_position/getOpenPositionMaster");
+const getTreeMapData = require("../controller/open_position/getTreeMapData.js");
+const addOpenPosition = require("../controller/open_position/addOpenPositionMaster");
 const router = express.Router();
 
 router.get("/getUsers", verifyAccessToken, getUsers);
@@ -74,7 +77,7 @@ router.get("/getUserRoles", getUserRole);
 
 router.get("/getUserModules", verifyAccessToken, getUserModules);
 
-router.post("/deleteUserRole", deleteUserRole);
+router.post("/deleteUserRole", verifyAccessToken, deleteUserRole);
 
 router.post("/updateUserRoleFieldPermission", updateUserRoleFieldPermission);
 
@@ -95,6 +98,13 @@ router.post("/getRoleBaseTabList", getRoleBaseTabList);
 router.post("/getRoleBaseTabList", getRoleBaseTabList);
 
 router.post("/getAccessToken", getAccessToken);
+
+router.get("/getOpenPositionMaster", getOpenPositionMaster);
+
+router.get("/getTreeMapData", getTreeMapData);
+
+router.post("/addOpenPositionMaster", addOpenPosition);
+
 
 router.get("/getPublicKey", function (req, res, next) {
     res.json(ENCODED_PUBLIC_KEY);

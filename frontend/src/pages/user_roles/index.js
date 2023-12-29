@@ -24,6 +24,7 @@ import { ADD_USER_ROLE, DELETE_USER_ROLE, GET_USER_MODULES, GET_USER_ROLES, UPDA
 import axios from 'axios';
 import { message } from "antd";
 import userRoleConext from './userRoleContext';
+import CustomDialog from '../global_component/customDialog';
 
 export default function UserRoles(props) {
 
@@ -44,6 +45,7 @@ export default function UserRoles(props) {
         axios.get(GET_USER_ROLES).
             then(res => {
                 setUserRoles(res.data);
+
                 axios.get(GET_USER_MODULES).
                     then(result => {
                         setIsLoading(false);
@@ -290,18 +292,11 @@ function Row(props) {
     function closeDeleteRoleDialog() {
         setDeleteUserRoleDialog(false);
     }
+    function deleteUser() {
+        props.deleteUserRole(data.roleName);
+    }
     return <React.Fragment>
-        <Dialog open={deleteUserRoleDialog}>
-            <DialogContent>
-                <Box mt={2}>
-                    <Typography>Are you sure you want to delete this role?</Typography>
-                </Box>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={closeDeleteRoleDialog}>Cancel</Button>
-                <LoadingButton onClick={() => { props.deleteUserRole(data.roleName); closeDeleteRoleDialog() }}>Delete</LoadingButton>
-            </DialogActions>
-        </Dialog>
+        <CustomDialog message="Are you sure you want to delete this role?" open={deleteUserRoleDialog} onClose={closeDeleteRoleDialog} customAction={deleteUser} />
         {contextHolder}
         <TableRow sx={{ "& td": { border: 0 } }}>
             <TableCell sx={{ width: '30px' }}>
@@ -362,5 +357,5 @@ function Row(props) {
 
             </TableCell>
         </TableRow>
-    </React.Fragment>;
+    </React.Fragment >;
 }

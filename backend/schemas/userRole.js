@@ -10,7 +10,10 @@ const userRoleSchema = new Schema({
     perms: {
         type: Array, default: []
     },
-    removable: { type: Boolean, required: true, default: true }
+    removable: { type: Boolean, required: true, default: true },
+    softDeleted: {
+        type: Boolean, default: false
+    }
 }, {
     timestamps: true,
 });

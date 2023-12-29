@@ -23,7 +23,7 @@ export default function NewUserDialog(props) {
     const data = useRef({
         fname: "", lname: "", dob: "", role: "", email: "", phone: ""
     });
-
+    console.log(roles, "This is the role")
     function onChange(e) {
         data.current[e.target.name] = e.target.value;
         console.log(data.current);
