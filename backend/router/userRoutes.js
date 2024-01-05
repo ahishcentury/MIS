@@ -16,8 +16,6 @@ const removeFormattedFile = require("../controller/holding_cost/removeFormattedF
 const fetchFormattedFileMaster = require("../controller/holding_cost/fetchFormattedFileMaster");
 const readHoldingCostUploadsDir = require("../controller/holding_cost/readHoldingCostUploadsDir");
 const fetchFormattedFileByName = require("../controller/holding_cost/fetchFormattedFileByName");
-const UserRole = require("../schemas/userRole");
-const userModules = require("../schemas/userModules");
 const addUserRole = require("../controller/user_role/addUserRole");
 const addModules = require("../controller/modules/addModules");
 const getUserRole = require("../controller/user_role/getUserRole");
@@ -35,6 +33,9 @@ const { verifyAccessToken } = require("../controller/authentication/authUsers");
 const getOpenPositionMaster = require("../controller/open_position/getOpenPositionMaster");
 const getTreeMapData = require("../controller/open_position/getTreeMapData.js");
 const addOpenPosition = require("../controller/open_position/addOpenPositionMaster");
+const getSwapChangeDashboard = require("../controller/holding_cost/mainData/getHoldingCostMaster.js");
+const getAllSwapChangeMaster = require("../controller/holding_cost/mainData/getAllSwapChangeMaster.js");
+const addSwapChangeMaster = require("../controller/holding_cost/mainData/addSwapChangeMaster.js");
 const router = express.Router();
 
 router.get("/getUsers", verifyAccessToken, getUsers);
@@ -104,6 +105,13 @@ router.post("/getOpenPositionMaster", getOpenPositionMaster);
 router.get("/getTreeMapData", getTreeMapData);
 
 router.post("/addOpenPositionMaster", addOpenPosition);
+
+router.get("/getAllSwapChangeMaster", getAllSwapChangeMaster);
+
+router.post("/getHoldingCostMaster", getSwapChangeDashboard);
+
+router.post("/addSwapChangeMaster", addSwapChangeMaster);
+
 
 
 router.get("/getPublicKey", function (req, res, next) {

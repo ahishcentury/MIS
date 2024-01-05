@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Double = require("@mongoosejs/double/lib");
 const Schema = mongoose.Schema;
 
 const dailySwapChangeMasterSchema = new Schema(
@@ -7,7 +8,7 @@ const dailySwapChangeMasterSchema = new Schema(
             type: String,
             required: true
         },
-        positionId: {
+        position: {
             type: String,
             required: true
         },
@@ -16,7 +17,7 @@ const dailySwapChangeMasterSchema = new Schema(
             required: true
         },
         dailySwapChange: {
-            type: String,
+            type: Double,
             required: true
         },
         finalRate: {
@@ -24,20 +25,34 @@ const dailySwapChangeMasterSchema = new Schema(
             required: true
         },
         baseRate: {
+            type: String,
+            required: true
+        },
+        markupRate: {
             type:
-                String, required: true
+                String,
+            required: true
         },
         markup: {
             type:
-                String, required: true
+                Double,
+            required: true
         },
-        LPCost: {
-            type:
-                String, required: true
+        lpCost: {
+            type: Double,
+            required: true
         },
         rebateableSwap: {
-            type:
-                String, required: true
+            type: Double,
+            required: true
+        },
+        platform: {
+            type: String,
+            required: true
+        },
+        feeGroup: {
+            type: String,
+            required: true
         },
     },
     {

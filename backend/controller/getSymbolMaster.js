@@ -48,11 +48,10 @@ module.exports = async function (req, res) {
     if (roleName != null) {
         userRoleModulesPermission = await UserRole.findById(roleName);
     }
-    let securityPermissions = userRoleModulesPermission.perms[0]["Securities"]
-    console.log("Securities", securityPermissions);
+    let symbolPermissions = userRoleModulesPermission.perms[0]["Symbols"]
     let temp = { _id: 1 };
-    Object.keys(securityPermissions).forEach(function (key) {
-        if (securityPermissions[key][1] === 1) {
+    Object.keys(symbolPermissions).forEach(function (key) {
+        if (symbolPermissions[key][1] === 1) {
             temp[key.toString()] = 1;
         }
     });

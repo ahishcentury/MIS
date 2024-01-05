@@ -4,7 +4,7 @@ let MODULEPERMISSIONS = [
         permission: { roles: { "Admin": [1, 1, 1] } }
     },
     {
-        moduleName: "Securities",
+        moduleName: "Symbols",
         permission: { roles: { "Admin": [1, 1, 1] } }
     },
     {
@@ -20,7 +20,7 @@ let MODULEPERMISSIONS = [
         permission: { roles: { "Admin": [1, 1, 1] } }
     },
     {
-        moduleName: "Holding Cost",
+        moduleName: "Holding Cost Rebate",
         permission: { roles: { "Admin": [1, 1, 1] } }
     },
     {

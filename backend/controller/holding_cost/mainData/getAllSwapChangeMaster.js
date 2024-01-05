@@ -1,13 +1,14 @@
-const SwapChangeMaster = require("../../schemas/dailySwapChangeMaster");
+const SwapChangeMaster = require("../../../schemas/dailySwapChangeMaster");
 
-const getSwapChangeData = async function (req, res, next) {
+const getAllSwapChangeMaster = async function (req, res, next) {
     try {
         let data = await SwapChangeMaster.find({});
         if (data)
-            return res.json({ status: "Success" });
+            return res.json(data);
+
     }
     catch (e) {
         console.log(e.message);
     }
 }
-module.exports = getSwapChangeData;
+module.exports = getAllSwapChangeMaster;
