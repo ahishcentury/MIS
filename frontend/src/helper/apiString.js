@@ -62,3 +62,5 @@ export const GET_OPEN_POSITION_MASTER = BASE_URL + "/users/getOpenPositionMaster
 
 export const GET_TREE_MAP_DATA = BASE_URL + "/users/getTreeMapData";
 
+export const GET_HOLDING_COST = BASE_URL + "/users/getHoldingCostMaster";
+

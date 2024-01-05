@@ -6,7 +6,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import { Button, Snackbar, Alert, Box, IconButton, Badge, Popover, ListItemIcon, List, Divider, Tab, Tabs, ListItem, ListItemText, ListItemButton, Stack, Typography } from '@mui/material';
 import FeeGroups from './groups/feeGroups';
-import Securities from './securities/securities';
+import Symbols from './symbols/symbols';
 import SMTP from './smtp/index';
 import { ThemeProvider } from '@mui/material/styles';
 import sidebarTheme from '../components/backofficeSidebarTheme';
@@ -21,6 +21,12 @@ import { CHECK_ALLOWED_USERS, GET_ROLE_BASE_TAB_LIST } from '../helper/apiString
 import { useLocation } from "react-router-dom";
 import UserRoleConext from "./user_roles/userRoleContext";
 import OpenPositionHome from './open_positions/openPositionHome';
+
+import { SidebarNav, SidebarWrap, NavIcon, Nav, SidebarLink, SidebarLabel, DropdownLink, SidebarData } from './constants';
+import * as FaIcons from 'react-icons/fa';
+import * as AiIcons from 'react-icons/ai';
+import { IconContext } from 'react-icons/lib';
+import HoldingCostDashboard from './holding_cost/holdingCostDashboard';
 
 export default function Home(props) {
     const { window } = props;
@@ -37,7 +43,6 @@ export default function Home(props) {
     ]);
     const userContext = useContext(UserRoleConext);
     const [modulePermissionData, setModulePermissionData] = useState({});
-
 
     const logout = () => {
         if (localStorage.getItem("userToken")) {
@@ -65,6 +70,7 @@ export default function Home(props) {
                                 allowedTabList.push({ label: Object.keys(mList[i])[0], value: Object.keys(mList[i])[0] })
                             }
                         }
+                        allowedTabList.push({ label: "HC Dashboard", value: "Holding Cost Dashboard" })
                         setTabList(allowedTabList);
                         setModulePermissionData(modulePermissionObj);
                     })
@@ -79,59 +85,63 @@ export default function Home(props) {
     useEffect(() => {
         // userContext.setName("Qasim")
         userAuth();
-        console.log("User Auth Term")
     }, [])
-    return (<Box sx={{ display: 'flex', width: '100vw', height: '100vh', flexDirection: 'row', overflow: 'hidden' }}>
+    // return <SideBar tabList={tabList} />;
+    return (
+        <Box sx={{ display: 'flex', width: '100vw', height: '100vh', flexDirection: 'row', overflow: 'hidden' }}>
 
-        {<SideBar tabList={tabList} />}
+            {<SideBar tabList={tabList} />}
 
-        <Divider orientation='vertical' sx={{ height: '100%' }} />
+            <Divider orientation='vertical' sx={{ height: '100%' }} />
 
-        <Box sx={{ flex: 1, height: '100%', overflow: 'scroll', boxSizing: 'border-box' }}>
+            <Box sx={{ flex: 1, height: '100%', overflow: 'scroll', boxSizing: 'border-box' }}>
 
-            <Divider />
-            {module === "Fee Groups" && <FeeGroups />}
-            {module === "Securities" && <Securities />}
-            {module === "User Roles" && <UserRoles />}
-            {module === "Open Position" && <OpenPositionHome />}
-            {module === "Users" && <Users modulePermissionData={modulePermissionData["Users"]} />}
-            {module === "SMTP Setup" && <SMTP modulePermissionData={modulePermissionData["SMTP Setup"]} />}
-            {module === "Holding Cost" && <HoldingCostFileUploads />}
+                <Divider />
+                {module === "Fee Groups" && <FeeGroups />}
+                {module === "Symbols" && <Symbols />}
+                {module === "User Roles" && <UserRoles />}
+                {module === "Open Position" && <OpenPositionHome />}
+                {module === "Users" && <Users modulePermissionData={modulePermissionData["Users"]} />}
+                {module === "SMTP Setup" && <SMTP modulePermissionData={modulePermissionData["SMTP Setup"]} />}
+                {module === "Holding Cost Rebate" && <HoldingCostFileUploads />}
+                {module === "Holding Cost Dashboard" && <HoldingCostDashboard />}
 
-            <Snackbar
-                open={context.snackbarMsg}
-                autoHideDuration={6000}
-                severity={context.severity}
-                onClose={closeSnackbar}
-                action={<IconButton
-                    size="small"
-                    aria-label="close"
-                    color="inherit"
-                    onClick={closeSnackbar}
+                <Snackbar
+                    open={context.snackbarMsg}
+                    autoHideDuration={6000}
+                    severity={context.severity}
+                    onClose={closeSnackbar}
+                    action={<IconButton
+                        size="small"
+                        aria-label="close"
+                        color="inherit"
+                        onClick={closeSnackbar}
+                    >
+                        <CloseIcon fontSize="small" />
+                    </IconButton>}
                 >
-                    <CloseIcon fontSize="small" />
-                </IconButton>}
-            >
-                <Alert onClose={closeSnackbar} severity={context.severity} sx={{ width: '100%' }}>
-                    {context.snackbarMsg}
-                </Alert>
-            </Snackbar>
+                    <Alert onClose={closeSnackbar} severity={context.severity} sx={{ width: '100%' }}>
+                        {context.snackbarMsg}
+                    </Alert>
+                </Snackbar>
 
 
-            {!["theming", "Holding Cost", "automations", "Open Position", "Users", "registration", "Fee Groups", "Securities", "User Roles", "approvalStages", "emailDesigner", "legalDocs", "SMTP Setup"].includes(module) &&
-                <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <Typography variant="h1">404</Typography>
+                {!["theming", "Holding Cost", "Holding Cost Dashboard", "automations", "Open Position", "Users", "registration", "Fee Groups", "Symbols", "User Roles", "approvalStages", "emailDesigner", "legalDocs", "SMTP Setup"].includes(module) &&
+                    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <Typography variant="h1">404</Typography>
 
-                    <h3>Page you're looking for does not exist</h3>
-                </Box>}
+                        <h3>Page you're looking for does not exist</h3>
+                    </Box>}
 
-        </Box>
+            </Box>
 
 
-    </Box>);
+        </Box>);
 
     function SideBar(props) {
         const { tabList } = props;
+
+        ///This is the Side Bar check
 
         useEffect(() => {
         }, []);
@@ -148,7 +158,7 @@ export default function Home(props) {
                 return
 
             }
-
+            console.log(tabValue, " Look I m the tab value")
             setTabPanelValue(tabValue);
             navigate("/mis_home/" + tabValue);
 
@@ -179,8 +189,6 @@ export default function Home(props) {
 
         </Box>
     }
-
-
     function AppBar(props) {
 
         const { notifications } = props;
@@ -254,24 +262,73 @@ export default function Home(props) {
             </Box>
         </Box>
     }
+    function SideBarOne(props) {
+        const [sidebar, setSidebar] = useState(false);
+
+        const showSidebar = () => {
+            console.log("I m being clicked")
+            setSidebar(!sidebar)
+        };
+
+        return (
+            <>
+                <IconContext.Provider value={{ color: '#fff' }}>
+                    <Nav>
+                        <NavIcon to='#'>
+                            <FaIcons.FaBars onClick={showSidebar} />
+                        </NavIcon>
+                    </Nav>
+                    <SidebarNav sidebar={sidebar}>
+                        <SidebarWrap>
+                            <NavIcon to='#'>
+                                <AiIcons.AiOutlineClose onClick={showSidebar} />
+                            </NavIcon>
+                            {SidebarData.map((item, index) => {
+                                return <SubMenu item={item} key={index} />;
+                            })}
+                        </SidebarWrap>
+                    </SidebarNav>
+                </IconContext.Provider>
+            </>
+        );
+    };
+
+    function SubMenu(props) {
+        const [subnav, setSubnav] = useState(false);
+
+        const showSubnav = () => setSubnav(!subnav);
+
+        return (
+            <>
+                <SidebarLink to={props.path} onClick={props.subNav && showSubnav}>
+                    <div>
+                        {props.icon}
+                        <SidebarLabel>{props.title}</SidebarLabel>
+                    </div>
+                    <div>
+                        {props.subNav && subnav
+                            ? props.iconOpened
+                            : props.subNav
+                                ? props.iconClosed
+                                : null}
+                    </div>
+                </SidebarLink>
+                {subnav &&
+                    props.subNav.map((props, index) => {
+                        return (
+                            <DropdownLink to={props.path} key={index}>
+                                {props.icon}
+                                <SidebarLabel>{props.title}</SidebarLabel>
+                            </DropdownLink>
+                        );
+                    })}
+            </>
+        );
+    };
 
 
 
 }
-
-
-function TabLabel(label) {
-
-
-    return <ListItem disablePadding >
-        <ListItemText primary={<span style={{ fontSize: '14px', fontWeight: 'bolder' }}>{label}</span>} />
-    </ListItem>
-}
-
-
-
-
-
 
 function NotificationPopover(props) {
     const { isOpen, anchorEl, onClose, notifications } = props;

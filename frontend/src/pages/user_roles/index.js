@@ -256,8 +256,8 @@ function Row(props) {
                 a.push(m);
             }
         }
-        if (rolePermissions.hasOwnProperty("Securities")) {
-            if (m["moduleName"] == "Securities") {
+        if (rolePermissions.hasOwnProperty("Symbols")) {
+            if (m["moduleName"] == "Symbols") {
                 a.push(m)
             }
         }
@@ -276,8 +276,13 @@ function Row(props) {
                 a.push(m)
             }
         }
-        if (rolePermissions.hasOwnProperty("Holding Cost")) {
-            if (m["moduleName"] == "Holding Cost") {
+        if (rolePermissions.hasOwnProperty("Holding Cost Rebate")) {
+            if (m["moduleName"] == "Holding Cost Rebate") {
+                a.push(m)
+            }
+        }
+        if (rolePermissions.hasOwnProperty("Open Position")) {
+            if (m["moduleName"] == "Open Position") {
                 a.push(m)
             }
         }
@@ -337,7 +342,7 @@ function Row(props) {
                     {
 
                         userModules.map(m => {
-                            // { console.log(m) }
+                            { console.log(m, "Structure of M") }
                             return <ModuleAccessComponent
                                 key={m.key}
                                 reRenderPage={() => {

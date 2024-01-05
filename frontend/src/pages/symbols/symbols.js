@@ -15,7 +15,7 @@ import AppContext from "../../AppContext";
 // import AddSecurityDialog from "./addSecurityDialog";
 
 
-export default function Securities(props) {
+export default function Symbols(props) {
 
   const [addSecurityDialogOpen, setAddSecurityDialogOpen] = useState(false);
   const [importDialogVisible, setImportDialogVisible] = useState(false);
@@ -64,18 +64,18 @@ export default function Securities(props) {
       { title: "Path", dataIndex: "path", render: (x) => <Space style={{ width: 150 }}>{x}</Space> },
       { title: "Description", dataIndex: "description", render: (x) => <Space style={{ width: 300 }}>{x}</Space> },
       { title: "Sector", dataIndex: "sector" },
-      { title: "Min Lot Size", dataIndex: "minLotSize", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
-      { title: "Max Lot Size", dataIndex: "maxLotSize", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
-      { title: "Step Interval", dataIndex: "stepInterval", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
-      { title: "Position Limit", dataIndex: "positionLimit", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
+      { title: "Min Lot Size", dataIndex: "min", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
+      { title: "Max Lot Size", dataIndex: "max", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
+      { title: "Step Interval", dataIndex: "step", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
+      { title: "Position Limit", dataIndex: "limit", render: (x) => <Space style={{ width: 100 }}>{x != undefined ? x.toLocaleString() : x}</Space> },
       { title: "Stop Level", dataIndex: "stopLevel" },
       { title: "Base Currency", dataIndex: "baseCur" },
       { title: "Profit Currency", dataIndex: "profitCur" },
       { title: "Margin Currency", dataIndex: "marginCur" },
-      { title: "Commission Fee", dataIndex: "commissionFee" },
-      { title: "Spread Fee", dataIndex: "spreadFee" },
+      { title: "Commission Fee", dataIndex: "commission" },
+      { title: "Spread Fee", dataIndex: "spread" },
       { title: "Margin", dataIndex: "margin" },
-      { title: "Spread Def", dataIndex: "spreadDef" },
+      { title: "Spread Def", dataIndex: "spreaddef" },
       { title: "Contract Size", dataIndex: "contractSize" },
       { title: "Swap Short", dataIndex: "swapShort" },
       { title: "Swap Long", dataIndex: "swapLong" },
@@ -85,6 +85,8 @@ export default function Securities(props) {
         arr.push(columns[i]);
       }
     }
+    console.log("this is my array : ", arr)
+    console.log("this is my data Source : ", symbol)
     return arr;
   }
 

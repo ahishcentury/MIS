@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Column } from '@ant-design/plots';
+import { forEach, groupBy } from 'lodash-es';
 import {
     Box, Grid,
     Typography, Paper, Table,
@@ -26,8 +28,8 @@ import { styled } from "@mui/material/styles";
 import StatCard from "../global_component/statCard-component";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import axios from "axios";
-import { motion } from "framer-motion"
-import { GET_OPEN_POSITION_MASTER, GET_TREE_MAP_DATA } from "../../helper/apiString";
+import DateRangeTimePicker from "../../components/dateRangeTimePicker";
+import { GET_HOLDING_COST, GET_TREE_MAP_DATA } from "../../helper/apiString";
 import { Divider } from "antd";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -48,10 +50,10 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-const OpenPositionHome = () => {
+const HoldingCostDashboard = () => {
     const statCardGridSize = { xl: 2, lg: 3, md: 4, sm: 6, xs: 12 };
-    const [openPosition, setOpenPosition] = useState();
-    const [userList, setUserList] = useState();
+    const [holdingCost, setHoldingCost] = useState();
+    const [clientList, setClientList] = useState();
     const [symbolList, setSymbolList] = useState();
     const [directionList, setDirectionList] = useState(["BUY", "SELL"]);
     const [treeMapData, setTreeMapData] = useState();
@@ -61,23 +63,22 @@ const OpenPositionHome = () => {
     const [isLoadingTreeMapData, setIsLoadingTreeMapData] = useState(true);
     const [value, setValue] = React.useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [selectedClient, setSelectedClient] = useState("");
-    const [selectedSymbol, setSelectedSymbol] = useState("");
-    const [selectedDirection, setSelectedDirection] = useState("");
     const [reloadData, setReloadData] = useState(true);
+    const [dateRange, setDateRange] = useState([]);
     const filterValues = useRef({
-        filterByClient: "",
-        filterBySymbol: "",
-        filterByPositionDirection: ""
+        client: "",
+        symbol: "",
+        startDate: "",
+        endDate: "",
     });
     const columns = [
         {
-            field: "loginid",
+            field: "client",
             renderCell: (params) => {
-                return params.row.loginid;
+                return params.row.client;
             },
             renderHeader: (params) => (
-                <strong> {'Login ID '} </strong>
+                <strong> {'Client'} </strong>
             ),
             flex: 1,
             minWidth: 50,
@@ -96,12 +97,12 @@ const OpenPositionHome = () => {
             align: "center",
         },
         {
-            field: "lotsize",
+            field: "feeGroup",
             renderHeader: (params) => (
-                <strong> {'Lot Size'} </strong>
+                <strong> {'Fee Group'} </strong>
             ),
             renderCell: (params) => {
-                return params.row.lotsize;
+                return params.row.feeGroup;
             },
             flex: 1,
             minWidth: 100,
@@ -109,12 +110,12 @@ const OpenPositionHome = () => {
             align: "center",
         },
         {
-            field: "type",
+            field: "position",
             renderHeader: (params) => (
-                <strong> {'Type'} </strong>
+                <strong> {'Position'} </strong>
             ),
             renderCell: (params) => {
-                return params.row.type;
+                return params.row.position;
             },
             flex: 1,
             minWidth: 100,
@@ -122,13 +123,12 @@ const OpenPositionHome = () => {
             align: "center",
         },
         {
-            field: "price",
+            field: "baseRate",
             renderHeader: (params) => (
-                <strong> {'Price'} </strong>
+                <strong> {'Base Rate'} </strong>
             ),
             renderCell: (params) => {
-                let price = "USD " + params.row.price;
-                return price;
+                return params.row.baseRate;
             },
             flex: 1,
             minWidth: 100,
@@ -136,12 +136,12 @@ const OpenPositionHome = () => {
             align: "center",
         },
         {
-            field: "swap",
+            field: "markupRate",
             renderHeader: (params) => (
-                <strong> {'Swap'} </strong>
+                <strong> {'Markup Rate'} </strong>
             ),
             renderCell: (params) => {
-                return params.row.swap;
+                return params.row.markupRate;
             },
             flex: 1,
             minWidth: 100,
@@ -149,14 +149,38 @@ const OpenPositionHome = () => {
             align: "center",
         },
         {
-            field: "profitCur",
+            field: "finalRate",
             renderHeader: (params) => (
-                <strong> {'Profit Currency'} </strong>
+                <strong> {'Final Rate'} </strong>
             ),
             renderCell: (params) => {
-                return params.row.profitCur != null ?
-                    <p> {params.row.profitCur}</p>
-                    : "Unknown"
+                return params.row.finalRate;
+            },
+            flex: 1,
+            minWidth: 100,
+            headerAlign: "center",
+            align: "center",
+        },
+        {
+            field: "lpCost",
+            renderHeader: (params) => (
+                <strong> {'LP Cost'} </strong>
+            ),
+            renderCell: (params) => {
+                return params.row.lpCost;
+            },
+            flex: 1,
+            minWidth: 100,
+            headerAlign: "center",
+            align: "center",
+        },
+        {
+            field: "platform",
+            renderHeader: (params) => (
+                <strong> {'Palltform'} </strong>
+            ),
+            renderCell: (params) => {
+                return params.row.platform;
             },
             flex: 1,
             minWidth: 100,
@@ -166,18 +190,18 @@ const OpenPositionHome = () => {
     ];
     function resetFilter() {
         filterValues.current = {
-            filterByClient: "",
-            filterBySymbol: "",
-            filterByPositionDirection: ""
+            client: null,
+            symbol: null,
+            startDate: null,
+            endDate: null,
         };
     }
-    function getOpenPosition() {
+    function getHoldingCost() {
         setIsLoading(true)
-        axios.post(GET_OPEN_POSITION_MASTER, old).then((result) => {
-            console.log(result.data, "This is my data");
-            setOpenPosition(result.data);
-            setUserList(result.data[0].uniqueLists[0].userList);
-            setSymbolList(result.data[0].uniqueLists[0].symbolList);
+        axios.post(GET_HOLDING_COST, old).then((result) => {
+            setHoldingCost(result.data);
+            setClientList(result.data[0].uniqueLists[0].totalClients);
+            setSymbolList(result.data[0].uniqueLists[0].totalSymbols);
             setIsLoading(false)
         }).catch((e) => {
             setIsLoading(true)
@@ -186,7 +210,7 @@ const OpenPositionHome = () => {
     }
     const callGetOpenPosition = () => {
         setReloadData(!reloadData);
-        getOpenPosition();
+        getHoldingCost();
     }
     const callResetFilter = () => {
         setReloadData(!reloadData);
@@ -195,7 +219,6 @@ const OpenPositionHome = () => {
     function getTreeMapData() {
         setIsLoadingTreeMapData(true)
         axios.get(GET_TREE_MAP_DATA).then((result) => {
-            console.log(result.data);
             setTreeMapData(result.data);
             setTreeMapDataFiltered(result.data[0].symbolTxnsCount)
             setIsLoadingTreeMapData(false)
@@ -209,32 +232,33 @@ const OpenPositionHome = () => {
         old = filterValues.current;
         old[e.target.name] = e.target.value;
         filterValues.current = old;
-        console.log(filterValues.current, "This is the Test")
     }
     useEffect(() => {
-        getOpenPosition();
+        getHoldingCost();
         getTreeMapData();
     }, [reloadData]);
     let namingMap = {
-        "countOfOpenPosition": "Total Positions",
-        "unRealizedSwapTotal": "Total Unrealized Swap",
-        "tradeVolumeTotal": "Total Trade Volume",
-        "symbolCount": "Total Symbols",
-        "userCount": "Total Users"
+        "totalSwap": "Total Swap",
+        "totalMarkup": "Total Markup Swap",
+        "totalLpSwap": "Total LP Swap",
+        "totalClients": "Total Clients",
+        "totalSymbols": "Total Symbols",
+        "totalPosition": "Total Positions",
     }
     let infoMap = {
-        "countOfOpenPosition": "Total Open Positions",
-        "unRealizedSwapTotal": "Total Unrealized Swap",
-        "tradeVolumeTotal": "Total Trade Volume",
-        "symbolCount": "Total number of traded Symbols",
-        "userCount": "Total open position's Users "
+        "totalSwap": "Total Swap",
+        "totalMarkup": "Total Markup Swap",
+        "totalLpSwap": "Total LP Swap",
+        "totalClients": "Total Clients",
+        "totalSymbols": "Total Symbols",
+        "totalPosition": "Total Positions",
     }
     return <>
-        {openPosition && treeMapData ? <Box>
+        {holdingCost && treeMapData ? <Box>
             <Grid container spacing={5} p={3} mb={3} alignItems="center"
                 justifyContent="center" sx={{ backgroundColor: "#ffd700" }}>
                 <Grid item >
-                    <Typography style={{ fontWeight: 700, fontSize: 24 }}>Open Position Dashboard
+                    <Typography style={{ fontWeight: 700, fontSize: 24 }}>Holding Cost Dashboard
                     </Typography>
                 </Grid>
             </Grid>
@@ -258,7 +282,7 @@ const OpenPositionHome = () => {
                                 width: "100%",
                             }}
                         >
-                            {userList && <Grid item lg={2} xl={2} md={2} sm={6} xs={12}>
+                            {clientList && <Grid item lg={2} xl={2} md={2} sm={6} xs={12}>
                                 <FormControl sx={{ width: "100%" }}>
                                     <Autocomplete
                                         disablePortal
@@ -266,30 +290,12 @@ const OpenPositionHome = () => {
                                         defaultValue={"All"}
                                         onChange={(e, option) => {
                                             handleValueChange({
-                                                target: { name: "filterByClient", value: option },
+                                                target: { name: "client", value: option },
                                             });
                                         }}
-                                        options={["All"].concat(userList)}
+                                        options={["All"].concat(clientList)}
                                         renderInput={(params) => (
                                             <TextField {...params} label="Client" />
-                                        )}
-                                    />
-                                </FormControl>
-                            </Grid>}
-                            {directionList && <Grid item lg={2} xl={2} md={2} sm={6} xs={12}>
-                                <FormControl sx={{ width: "100%" }}>
-                                    <Autocomplete
-                                        disablePortal
-                                        size="small"
-                                        defaultValue={"All"}
-                                        onChange={(e, option) => {
-                                            handleValueChange({
-                                                target: { name: "filterByPositionDirection", value: option },
-                                            });
-                                        }}
-                                        options={["All"].concat(directionList)}
-                                        renderInput={(params) => (
-                                            <TextField {...params} label="Direction" />
                                         )}
                                     />
                                 </FormControl>
@@ -302,7 +308,7 @@ const OpenPositionHome = () => {
                                         defaultValue={"All"}
                                         onChange={(e, option) => {
                                             handleValueChange({
-                                                target: { name: "filterBySymbol", value: option },
+                                                target: { name: "symbol", value: option },
                                             });
                                         }}
                                         options={["All"].concat(symbolList)}
@@ -312,6 +318,13 @@ const OpenPositionHome = () => {
                                     />
                                 </FormControl>
                             </Grid>}
+                            <Grid item lg={2} xl={2} md={2} sm={6} xs={12}>
+                                <DateRangeTimePicker
+                                    state={dateRange}
+                                    setState={setDateRange}
+                                    filterValues={filterValues}
+                                />
+                            </Grid>
 
                             <Grid item lg={1} xl={1} md={3} sm={6} xs={12}>
                                 <Button
@@ -341,10 +354,10 @@ const OpenPositionHome = () => {
             <Paper>
                 {!isLoading && <Grid container spacing={2} p={1} mt={1} alignItems="center"
                     justifyContent="center">
-                    {Object.keys(openPosition[0].statistics[0]).map((key, index) => {
+                    {Object.keys(holdingCost[0].statistics[0]).map((key, index) => {
                         return <Grid item {...statCardGridSize}>
                             <StatCard
-                                value={Math.abs(openPosition[0].statistics[0][key]).toLocaleString()}
+                                value={Math.abs(holdingCost[0].statistics[0][key]).toLocaleString()}
                                 heading={namingMap[key]}
                                 infoKey={infoMap[key]}
                             />
@@ -356,64 +369,7 @@ const OpenPositionHome = () => {
                 <Paper sx={{ marginTop: "10px" }}>
                     <Grid container spacing={2} p={2} sx={{ backgroundColor: "white" }}>
                         <Grid item lg={6} xl={6} md={6} sm={12} xs={12}>
-
-                            <Paper sx={{ height: "400px", overflow: "auto", position: "relative" }}>
-                                <span
-                                    style={{
-                                        float: "right",
-                                        marginTop: "10px",
-                                        marginRight: "10px",
-                                    }}
-                                >
-                                    <CSVLink
-                                        filename="Symbol Wise Transaction Count"
-                                        data={treeMapDataFiltered || []}
-                                    >
-                                        <SystemUpdateAltIcon sx={{ color: "black" }} />
-                                    </CSVLink>
-                                </span>
-                                <h3>
-                                    Symbol wise Open Position{" "}
-                                    <InfoPopover
-                                        content={"Symbol wise Open Position"}
-                                    />
-                                </h3>
-                                <label>Filter by&nbsp;</label>
-                                <select
-                                    defaultValue={"byTxnCount"}
-                                    style={{ fontSize: 14 }}
-                                    onChange={(e) => {
-                                        setTreeMapDataFiltered([])
-                                        setTreeMapDataFilterBy(e.target.value);
-                                        if (e.target.value == "byTxnCount") {
-                                            setTreeMapDataFiltered(treeMapData[0].symbolTxnsCount)
-                                        }
-                                        else if (e.target.value == "byTxnVolume") {
-                                            setTreeMapDataFiltered(treeMapData[0].symbolTxnsVolume)
-                                        }
-                                        else if (e.target.value == "byDistinctUsers") {
-                                            setTreeMapDataFiltered(treeMapData[0].symbolTxnsDistinctUser)
-                                        }
-                                    }}
-                                >
-                                    <option value={"byTxnCount"}>Txn Count</option>
-                                    <option value={"byTxnVolume"}>Txn Volume</option>
-                                    <option value={"byDistinctUsers"}>
-                                        Distinct Users
-                                    </option>
-                                </select>
-                                {treeMapDataFiltered && treeMapDataFiltered.length > 0 ? (
-                                    <TreeMapComponent
-                                        data={treeMapDataFiltered}
-                                        isLoading={isLoadingTreeMapData}
-                                        colorField={"name"}
-                                        valueField={"value"}
-                                        filter={treeMapDataFilterBy}
-                                    />
-                                ) : (
-                                    <NoDataElement />
-                                )}
-                            </Paper>
+                            <BarChartCompnent sx={{ height: "250px !important", }} swapData={holdingCost[0].barCharData} />
                         </Grid>
                         <Grid item lg={6} xl={6} md={6} sm={12} xs={12}>
                             <Box
@@ -422,7 +378,7 @@ const OpenPositionHome = () => {
                                     flexWrap: "wrap",
                                     "& > :not(style)": {
                                         width: "100%",
-                                        minHeight: "400px",
+                                        minHeight: "500px",
                                         padding: "0 5%",
                                     },
                                 }}
@@ -436,9 +392,9 @@ const OpenPositionHome = () => {
                                                 content={"Top Clients"}
                                             />
                                         </h2>
-                                        {openPosition && <span style={{ marginLeft: "30%" }}><CSVLink
-                                            filename="Top Users - Transaction Count"
-                                            data={value == 0 ? (openPosition[0].topUserListByTransactionVolume || []) : (openPosition[0].topUserListByTransactionCount || [])}
+                                        {holdingCost && <span style={{ marginLeft: "30%" }}><CSVLink
+                                            filename="Top Users - Swap Count"
+                                            data={value == 0 ? (holdingCost[0].topClientsGeneratingSwap || []) : (holdingCost[0].topSymbolsGeneratingSwap || [])}
                                         >
                                             <SystemUpdateAltIcon sx={{ color: "black" }} />
                                         </CSVLink></span>}
@@ -446,18 +402,17 @@ const OpenPositionHome = () => {
                                     <Tabs
                                         value={value}
                                         onChange={(e, value) => {
-                                            console.log(value)
                                             setValue(value);
                                         }}
                                     >
                                         <Tab style={{ width: "33%" }} label="By Volume" />
-                                        <Tab style={{ width: "33%" }} label="By Txn Count" />
+                                        <Tab style={{ width: "33%" }} label="By Symbol" />
                                     </Tabs>
                                     {value === 0 && (
                                         <div
                                             style={{
                                                 overflow: "auto",
-                                                height: "250px",
+                                                height: "350px",
                                             }}
                                         >
                                             <Table
@@ -469,20 +424,19 @@ const OpenPositionHome = () => {
                                                 <TableHead>
                                                     <TableRow>
                                                         <StyledTableCell>Client</StyledTableCell>
-                                                        <StyledTableCell>Txn Volume</StyledTableCell>
+                                                        <StyledTableCell>Swap</StyledTableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {openPosition &&
-                                                        Object.keys(openPosition[0].topUserListByTransactionVolume).map((x) => {
+                                                    {holdingCost &&
+                                                        Object.keys(holdingCost[0].topClientsGeneratingSwap).map((x) => {
                                                             return (
                                                                 <StyledTableRow>
                                                                     <StyledTableCell>
-                                                                        {openPosition[0].topUserListByTransactionVolume[x]._id}
+                                                                        {holdingCost[0].topClientsGeneratingSwap[x].client}
                                                                     </StyledTableCell>
                                                                     <StyledTableCell>
-                                                                        USD{" "}
-                                                                        {openPosition[0].topUserListByTransactionVolume[x].transactionVolumePerUser.toLocaleString()}
+                                                                        {holdingCost[0].topClientsGeneratingSwap[x].clientSwap}
                                                                     </StyledTableCell>
                                                                 </StyledTableRow>
                                                             );
@@ -495,7 +449,7 @@ const OpenPositionHome = () => {
                                         <div
                                             style={{
                                                 overflow: "auto",
-                                                height: "250px",
+                                                height: "350px",
                                             }}
                                         >
                                             <Table
@@ -506,20 +460,20 @@ const OpenPositionHome = () => {
                                             >
                                                 <TableHead>
                                                     <TableRow>
-                                                        <StyledTableCell>Client</StyledTableCell>
-                                                        <StyledTableCell>Txn Count</StyledTableCell>
+                                                        <StyledTableCell>Symbol</StyledTableCell>
+                                                        <StyledTableCell>Swap</StyledTableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {openPosition &&
-                                                        Object.keys(openPosition[0].topUserListByTransactionCount).map((x) => {
+                                                    {holdingCost &&
+                                                        Object.keys(holdingCost[0].topSymbolsGeneratingSwap).map((x) => {
                                                             return (
                                                                 <StyledTableRow>
                                                                     <StyledTableCell>
-                                                                        {openPosition[0].topUserListByTransactionCount[x]._id}
+                                                                        {holdingCost[0].topSymbolsGeneratingSwap[x].symbol}
                                                                     </StyledTableCell>
                                                                     <StyledTableCell>
-                                                                        {openPosition[0].topUserListByTransactionCount[x].transactionCount}
+                                                                        {holdingCost[0].topSymbolsGeneratingSwap[x].symbolSwap}
                                                                     </StyledTableCell>
                                                                 </StyledTableRow>
                                                             );
@@ -534,7 +488,7 @@ const OpenPositionHome = () => {
                     </Grid>
                     <Grid container spacing={2} p={2} sx={{ backgroundColor: "white" }}>
                         <Grid item lg={12}>
-                            {openPosition && <Box sx={{ height: 400, width: "100%" }}>
+                            {holdingCost && <Box sx={{ height: 400, width: "100%" }}>
                                 <DataGrid
                                     sx={{
                                         "& .MuiDataGrid-row:hover": {
@@ -577,7 +531,7 @@ const OpenPositionHome = () => {
                                         Toolbar: GridToolbar,
                                     }}
                                     onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                                    rows={openPosition[0].openPositionMaster}
+                                    rows={holdingCost[0].swapChangeMasterData}
                                     experimentalFeatures={{ newEditingApi: true }}
                                 />
                             </Box>}
@@ -587,6 +541,51 @@ const OpenPositionHome = () => {
             </Paper >
         </Box > : <><LinearProgress sx={{ justifyContent: "center>" }} /><h1>Loading...</h1></>}</>
 }
+function BarChartCompnent(props) {
+    const [data, setData] = useState(props.swapData);
+
+    useEffect(() => {
+    }, []);
+
+    const annotations = [];
+    forEach(groupBy(data, 'createdDate'), (values, k) => {
+        const value = values.reduce((a, b) => a + b.value, 0);
+        annotations.push({
+            type: 'text',
+            data: [k, value],
+            style: {
+                textAlign: 'center',
+                fontSize: 14,
+                fill: 'rgba(0,0,0,0.85)',
+            },
+            xField: 'createdDate',
+            yField: 'value',
+            style: {
+                text: `${value}`,
+                textBaseline: 'bottom',
+                position: 'top',
+                textAlign: 'center',
+            },
+            tooltip: false,
+        });
+    });
+
+    const config = {
+        data,
+        xField: 'createdDate',
+        yField: 'value',
+        stack: true,
+        colorField: 'type',
+        label: {
+            text: 'value',
+            textBaseline: 'bottom',
+            position: 'inside',
+        },
+        annotations,
+    };
+    return <Column {...config} />;
+};
+
 function NoDataElement() {
     return (
         <>
@@ -596,10 +595,6 @@ function NoDataElement() {
             <h2 style={{ color: "goldenrod" }}>No Data Available</h2>
         </>
     );
-}
-function FarmerMotionLoader(props) {
-    const { isVisible } = props;
-    return <motion.div animate={{ opacity: isVisible ? 1 : 0 }} />
 }
 function InfoPopover(props) {
     const { content, color = "black" } = props;
@@ -637,4 +632,4 @@ function InfoPopover(props) {
     );
 }
 
-export default OpenPositionHome;
+export default HoldingCostDashboard;
