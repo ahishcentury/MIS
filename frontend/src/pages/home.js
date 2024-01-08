@@ -17,7 +17,7 @@ import HoldingCostFileUploads from './holding_cost';
 import UserRoles from './user_roles';
 import Users from './users';
 import axios from 'axios';
-import { CHECK_ALLOWED_USERS, GET_ROLE_BASE_TAB_LIST } from '../helper/apiString';
+import { BASE_URL, CHECK_ALLOWED_USERS, GET_ROLE_BASE_TAB_LIST } from '../helper/apiString';
 import { useLocation } from "react-router-dom";
 import UserRoleConext from "./user_roles/userRoleContext";
 import OpenPositionHome from './open_positions/openPositionHome';
@@ -57,9 +57,10 @@ export default function Home(props) {
     }
 
     function userAuth() {
+        console.log("This is the main query");
         axios.post(CHECK_ALLOWED_USERS, { userType: localStorage.getItem("userType"), userEmail: localStorage.getItem("email") })
             .then((res) => {
-                axios.post(GET_ROLE_BASE_TAB_LIST, { email: localStorage.getItem("email") })
+                axios.post(BASE_URL + "/" + "TU" + GET_ROLE_BASE_TAB_LIST, { email: localStorage.getItem("email") })
                     .then((res) => {
                         let allowedTabList = [];
                         let modulePermissionObj = {}
@@ -83,7 +84,6 @@ export default function Home(props) {
             })
     }
     useEffect(() => {
-        // userContext.setName("Qasim")
         userAuth();
     }, [])
     // return <SideBar tabList={tabList} />;

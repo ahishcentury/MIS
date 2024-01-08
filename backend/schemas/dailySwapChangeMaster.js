@@ -60,5 +60,4 @@ const dailySwapChangeMasterSchema = new Schema(
     }
 );
 
-const dailySwapChangeMaster = mongoose.model('dailyswapchangemasters', dailySwapChangeMasterSchema);
-module.exports = dailySwapChangeMaster;
+module.exports = () => { let exportedModel = mongoose.connection.model('dailyswapchangemasters', dailySwapChangeMasterSchema); return exportedModel; };

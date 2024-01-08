@@ -1,8 +1,9 @@
-const HoldingRateMaster = require("../../schemas/holdingRateMaster");
+const HoldingRateMasterModel = require("../../schemas/holdingRateMaster");
 
 module.exports = async function (req, res, next) {
-  let masters = null;
   try {
+    let masters = null;
+    let HoldingRateMaster = HoldingRateMasterModel();
     masters = await HoldingRateMaster.find({}).sort({ createdAt: -1 }).limit(7);
 
     if (masters) {

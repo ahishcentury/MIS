@@ -1,7 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
-    Box, Grid,
-    Typography, Paper, Table,
+    Box,
+    Grid,
+    Typography,
+    Paper,
+    Table,
     TableBody,
     TableCell,
     TableHead,
@@ -13,7 +16,6 @@ import {
     TextField,
     Button,
     FormControl,
-    CircularProgress,
     LinearProgress
 } from '@mui/material';
 import Autocomplete from "@mui/material/Autocomplete";
@@ -22,13 +24,60 @@ import TreeMapComponent from "../global_component/treeMapChart";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { CSVLink, CSVDownload } from "react-csv";
 import { tableCellClasses } from "@mui/material/TableCell";
+import { Tooltip } from "antd";
 import { styled } from "@mui/material/styles";
 import StatCard from "../global_component/statCard-component";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import axios from "axios";
 import { motion } from "framer-motion"
-import { GET_OPEN_POSITION_MASTER, GET_TREE_MAP_DATA } from "../../helper/apiString";
+import { BASE_URL, GET_OPEN_POSITION_MASTER, GET_TREE_MAP_DATA } from "../../helper/apiString";
 import { Divider } from "antd";
+import Switch from "@mui/material/Switch";
+import UserRoleConext from "../user_roles/userRoleContext";
+const AntSwitch = styled(Switch)(({ theme }) => ({
+    width: 28,
+    height: 16,
+    padding: 0,
+    display: "flex",
+    "&:active": {
+        "& .MuiSwitch-thumb": {
+            width: 15,
+        },
+        "& .MuiSwitch-switchBase.Mui-checked": {
+            transform: "translateX(9px)",
+        },
+    },
+    "& .MuiSwitch-switchBase": {
+        padding: 2,
+        "&.Mui-checked": {
+            transform: "translateX(12px)",
+            color: "#fff",
+            "& + .MuiSwitch-track": {
+                opacity: 1,
+                backgroundColor:
+                    theme.palette.mode === "dark" ? "#04832a" : "#04832a",
+            },
+        },
+    },
+    "& .MuiSwitch-thumb": {
+        boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        transition: theme.transitions.create(["width"], {
+            duration: 200,
+        }),
+    },
+    "& .MuiSwitch-track": {
+        borderRadius: 16 / 2,
+        opacity: 1,
+        backgroundColor:
+            theme.palette.mode === "dark"
+                ? "rgba(255,255,255,.35)"
+                : "rgba(0,0,0,.25)",
+        boxSizing: "border-box",
+    },
+}));
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -50,15 +99,15 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const OpenPositionHome = () => {
     const statCardGridSize = { xl: 2, lg: 3, md: 4, sm: 6, xs: 12 };
-    const [openPosition, setOpenPosition] = useState();
+    const [openPosition, setOpenPosition] = useState(null);
     const [userList, setUserList] = useState();
     const [symbolList, setSymbolList] = useState();
     const [directionList, setDirectionList] = useState(["BUY", "SELL"]);
-    const [treeMapData, setTreeMapData] = useState();
+    const [treeMapData, setTreeMapData] = useState(null);
     const [treeMapDataFiltered, setTreeMapDataFiltered] = useState();
     const [treeMapDataFilterBy, setTreeMapDataFilterBy] = useState("byTxnCount");
     const [isLoading, setIsLoading] = useState(true);
-    const [isLoadingTreeMapData, setIsLoadingTreeMapData] = useState(true);
+    // const [isLoadingTreeMapData, setIsLoadingTreeMapData] = useState(true);
     const [value, setValue] = React.useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [selectedClient, setSelectedClient] = useState("");
@@ -70,6 +119,7 @@ const OpenPositionHome = () => {
         filterBySymbol: "",
         filterByPositionDirection: ""
     });
+    const userContext = useContext(UserRoleConext);
     const columns = [
         {
             field: "loginid",
@@ -164,6 +214,15 @@ const OpenPositionHome = () => {
             align: "center",
         },
     ];
+    const togglePlatformType = () => {
+        setReloadData(true);
+        if (userContext.platformType == "TU") {
+            userContext.setPlatformType("CFC");
+        }
+        else {
+            userContext.setPlatformType("TU");
+        }
+    };
     function resetFilter() {
         filterValues.current = {
             filterByClient: "",
@@ -173,12 +232,18 @@ const OpenPositionHome = () => {
     }
     function getOpenPosition() {
         setIsLoading(true)
-        axios.post(GET_OPEN_POSITION_MASTER, old).then((result) => {
-            console.log(result.data, "This is my data");
+        axios.post(BASE_URL + "/" + userContext.platformType + GET_OPEN_POSITION_MASTER, old).then((result) => {
             setOpenPosition(result.data);
-            setUserList(result.data[0].uniqueLists[0].userList);
-            setSymbolList(result.data[0].uniqueLists[0].symbolList);
+            if (result.data[0]["openPositionMaster"].length != 0) {
+                setUserList(result.data[0].uniqueLists[0].userList);
+                setSymbolList(result.data[0].uniqueLists[0].symbolList);
+            }
+            else {
+                setUserList([]);
+                setSymbolList([])
+            }
             setIsLoading(false)
+            getTreeMapData();
         }).catch((e) => {
             setIsLoading(true)
             console.log(e.message)
@@ -193,14 +258,12 @@ const OpenPositionHome = () => {
         resetFilter();
     }
     function getTreeMapData() {
-        setIsLoadingTreeMapData(true)
-        axios.get(GET_TREE_MAP_DATA).then((result) => {
+        axios.get(BASE_URL + "/" + userContext.platformType + GET_TREE_MAP_DATA).then((result) => {
             console.log(result.data);
             setTreeMapData(result.data);
-            setTreeMapDataFiltered(result.data[0].symbolTxnsCount)
-            setIsLoadingTreeMapData(false)
+            setTreeMapDataFiltered(result.data[0].symbolTxnsCount);
+            setIsLoading(false);
         }).catch((e) => {
-            setIsLoadingTreeMapData(true)
             console.log(e.message)
         })
     }
@@ -209,12 +272,10 @@ const OpenPositionHome = () => {
         old = filterValues.current;
         old[e.target.name] = e.target.value;
         filterValues.current = old;
-        console.log(filterValues.current, "This is the Test")
     }
     useEffect(() => {
         getOpenPosition();
-        getTreeMapData();
-    }, [reloadData]);
+    }, [reloadData, userContext.platformType]);
     let namingMap = {
         "countOfOpenPosition": "Total Positions",
         "unRealizedSwapTotal": "Total Unrealized Swap",
@@ -230,12 +291,26 @@ const OpenPositionHome = () => {
         "userCount": "Total open position's Users "
     }
     return <>
-        {openPosition && treeMapData ? <Box>
+        {openPosition && treeMapData && !isLoading ? <Box>
             <Grid container spacing={5} p={3} mb={3} alignItems="center"
                 justifyContent="center" sx={{ backgroundColor: "#ffd700" }}>
                 <Grid item >
                     <Typography style={{ fontWeight: 700, fontSize: 24 }}>Open Position Dashboard
                     </Typography>
+                </Grid>
+                <Grid item >
+                    <Tooltip title={!reloadData && openPosition && treeMapData ? "" : "Data is Loading"}>
+                        <span><AntSwitch
+                            disabled={!isLoading ? false : true}
+                            checked={userContext.platformType == "TU" ? true : false}
+                            onChange={(checked) => {
+
+                                console.log(treeMapData)
+                                togglePlatformType();
+                            }}
+                            inputProps={{ "aria-label": "ant design" }}
+                        /></span>
+                    </Tooltip>
                 </Grid>
             </Grid>
             <Paper
@@ -339,7 +414,7 @@ const OpenPositionHome = () => {
             </Paper>
             {/* Lower section */}
             <Paper>
-                {!isLoading && <Grid container spacing={2} p={1} mt={1} alignItems="center"
+                {openPosition[0].statistics[0] && !isLoading && <Grid container spacing={2} p={1} mt={1} alignItems="center"
                     justifyContent="center">
                     {Object.keys(openPosition[0].statistics[0]).map((key, index) => {
                         return <Grid item {...statCardGridSize}>
@@ -351,7 +426,6 @@ const OpenPositionHome = () => {
                         </Grid>
                     })}
                 </Grid>}
-                {/* This is the Lower Map */}
                 <Divider></Divider>
                 <Paper sx={{ marginTop: "10px" }}>
                     <Grid container spacing={2} p={2} sx={{ backgroundColor: "white" }}>
@@ -405,7 +479,7 @@ const OpenPositionHome = () => {
                                 {treeMapDataFiltered && treeMapDataFiltered.length > 0 ? (
                                     <TreeMapComponent
                                         data={treeMapDataFiltered}
-                                        isLoading={isLoadingTreeMapData}
+                                        isLoading={isLoading}
                                         colorField={"name"}
                                         valueField={"value"}
                                         filter={treeMapDataFilterBy}

@@ -18,5 +18,4 @@ const groupMasterSchema = new Schema(
     }
 );
 
-const groupMaster = mongoose.model('groupmasters', groupMasterSchema);
-module.exports = groupMaster;
+module.exports = () => { let exportedModel = mongoose.connection.model('groupmasters', groupMasterSchema); return exportedModel; };

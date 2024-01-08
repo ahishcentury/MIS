@@ -1,10 +1,11 @@
 const PERMISSIONS = require("../../permissions/moduleFieldPermissions");
-const UserRole = require("../../schemas/userRole");
+const UserRoleModel = require("../../schemas/userRole");
 module.exports = async function (req, res) {
     let {
         roleName,
         desc
     } = req.body;
+    let UserRole = UserRoleModel();
     let roleExisted = await UserRole.findOne({ roleName: roleName });
     if (!roleExisted) {
         let modulePermission = PERMISSIONS;

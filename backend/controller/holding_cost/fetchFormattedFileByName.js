@@ -1,10 +1,11 @@
-const HoldingRateMaster = require("../../schemas/holdingRateMaster");
+const HoldingRateMasterModel = require("../../schemas/holdingRateMaster");
 
 module.exports = async function (req, res, next) {
-    let masters = null;
-    let { fileName } = req.params;
-    console.log(fileName)
     try {
+        let HoldingRateMaster = HoldingRateMasterModel();
+        let masters = null;
+        let { fileName } = req.params;
+        console.log(fileName)
         masters = await HoldingRateMaster.find({ originalName: fileName });
 
         if (masters) {

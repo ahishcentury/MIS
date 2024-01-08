@@ -1,9 +1,13 @@
-const groupSchema = require("../schemas/groupMaster");
-const userMaster = require("../schemas/userMaster");
-const userModules = require("../schemas/userModules");
-const UserRole = require("../schemas/userRole");
+const groupModel = require("../schemas/groupMaster");
+const userMasterModel = require("../schemas/userMaster");
+const userModulesModel = require("../schemas/userModules");
+const UserRoleModel = require("../schemas/userRole");
 const getGroupsMaster = async (req, res) => {
     try {
+        let groupSchema = groupModel();
+        let userMaster = userMasterModel();
+        let userModules = userModulesModel();
+        let UserRole = UserRoleModel();
         const { email, userType } = req.payload;
         let roleName = null;
         let userRoleModulesPermission = null;

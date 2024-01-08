@@ -1,4 +1,4 @@
-const OpenPosition = require("../../schemas/openPosition");
+const OpenPositionModel = require("../../schemas/openPosition");
 let path = require("path");
 const fs = require("fs");
 const getOpenPositionMaster = async (req, res, next) => {
@@ -7,32 +7,33 @@ const getOpenPositionMaster = async (req, res, next) => {
     console.log(filterByPositionDirection);
     console.log(filterBySymbol);
     let searchQuery = {}
+    let OpenPosition = OpenPositionModel();
     try {
-        if (filterByClient != "") {
+        if (filterByClient != null && filterByClient !== "") {
             searchQuery.loginid = filterByClient
-            if (filterByPositionDirection != "") {
+            if (filterByPositionDirection != null && filterByPositionDirection !== "") {
                 searchQuery.type = filterByPositionDirection;
             }
-            if (filterBySymbol != "") {
+            if (filterBySymbol != null && filterBySymbol !== "") {
                 searchQuery.symbol = filterBySymbol;
             }
         }
 
-        else if (filterByPositionDirection != "") {
+        else if (filterByPositionDirection != null && filterByPositionDirection !== "") {
             searchQuery.type = filterByPositionDirection;
-            if (filterByClient != "") {
+            if (filterByClient != null && filterByClient !== "") {
                 searchQuery.loginid = filterByClient
             }
-            if (filterBySymbol != "") {
+            if (filterBySymbol != null && filterBySymbol !== "") {
                 searchQuery.symbol = filterBySymbol;
             }
         }
-        else if (filterBySymbol != "") {
+        else if (filterBySymbol != null && filterBySymbol !== "") {
             searchQuery.symbol = filterBySymbol;
-            if (filterByPositionDirection != "") {
+            if (filterByPositionDirection != null && filterByPositionDirection !== "") {
                 searchQuery.type = filterByPositionDirection;
             }
-            if (filterByClient != "") {
+            if (filterByClient != null && filterByClient !== "") {
                 searchQuery.loginid = filterByClient
             }
         }

@@ -54,13 +54,13 @@ export const DELETE_USER = BASE_URL + "/users/deleteUser";
 
 export const UPDATE_USER_INFO = BASE_URL + "/users/updateUserInfo";
 
-export const GET_ROLE_BASE_TAB_LIST = BASE_URL + "/users/getRoleBaseTabList";
+export const GET_ROLE_BASE_TAB_LIST = "/users/getRoleBaseTabList";
 
 export const GET_ACCESS_TOKEN = BASE_URL + "/users/getAccessToken";
 
-export const GET_OPEN_POSITION_MASTER = BASE_URL + "/users/getOpenPositionMaster";
+export const GET_OPEN_POSITION_MASTER = "/users/getOpenPositionMaster";
 
-export const GET_TREE_MAP_DATA = BASE_URL + "/users/getTreeMapData";
+export const GET_TREE_MAP_DATA = "/users/getTreeMapData";
 
-export const GET_HOLDING_COST = BASE_URL + "/users/getHoldingCostMaster";
+export const GET_HOLDING_COST = "/users/getHoldingCostMaster";
 

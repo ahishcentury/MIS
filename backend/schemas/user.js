@@ -144,4 +144,4 @@ userSchema.methods.comparePassword = function (candidatePassword, cb) {
     });
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = () => { let exportedModel = mongoose.connection.model('User', userSchema); return exportedModel; };

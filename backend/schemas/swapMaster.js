@@ -13,4 +13,4 @@ const swapMaster = new Schema(
     }
 );
 
-module.exports = mongoose.model("swapmasters", swapMaster);
+module.exports = () => { let exportedModel = mongoose.connection.model('swapmasters', swapMaster); return exportedModel; };

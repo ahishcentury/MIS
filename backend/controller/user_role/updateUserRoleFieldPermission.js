@@ -1,7 +1,8 @@
-const UserRole = require("../../schemas/userRole");
+const UserRoleModel = require("../../schemas/userRole");
 const UserModules = require("../../schemas/userModules");
 module.exports = async function (req, res) {
     console.log(req.body["data"]);
+    let UserRole = UserRoleModel();
     const {
         perms,
         _id,

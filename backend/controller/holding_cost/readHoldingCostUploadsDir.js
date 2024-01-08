@@ -1,10 +1,11 @@
 const fs = require('fs');
 const { parse } = require("csv-parse");
-const HoldingRateMaster = require("../../schemas/holdingRateMaster");
+const HoldingRateMasterModel = require("../../schemas/holdingRateMaster");
 module.exports = async function ReadHoldingCostUploadsDir(req, res) {
     let uploadedLatestData = []
     let mongoLatestData = []
     let dataread = []
+    let HoldingRateMaster = HoldingRateMasterModel();
     filenames = fs.readdirSync(__dirname + '../../../holding_cost_uploads/', { withFileTypes: true });
     let data = await HoldingRateMaster.find({});
     if (data.length != 0 && filenames.length != 0) {

@@ -13,4 +13,4 @@ const holdingRateMaster = new Schema(
     }
 );
 
-module.exports = mongoose.model("holdingratemasters", holdingRateMaster);
+module.exports = () => { let exportedModel = mongoose.connection.model('holdingratemasters', holdingRateMaster); return exportedModel; };

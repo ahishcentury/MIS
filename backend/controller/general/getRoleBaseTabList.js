@@ -1,15 +1,19 @@
-const User = require("../../schemas/user");
-const UserModule = require("../../schemas/userModules");
-const UserRole = require("../../schemas/userRole");
+const UserModel = require("../../schemas/user");
+const UserModuleModel = require("../../schemas/userModules");
+const UserRoleModel = require("../../schemas/userRole");
 const ObjectId = require('mongodb').ObjectId;
 module.exports = async function (req, res, next) {
   try {
+    let UserModule = UserModuleModel();
+    let UserRole = UserRoleModel();
+    let User = UserModel();
     const { email } = req.body;
     let userRoleData = null;
     let roleName = null;
     let userRoleModules = null;
     let allowedModuleList = [];
     let userData = await User.find({ email: email });
+    console.log("I m in this module");
     console.log(userData.length)
     if (userData.length != 0) {
       userRoleData = await UserRole.find({ "_id": new ObjectId(userData[0].role) });
@@ -19,7 +23,7 @@ module.exports = async function (req, res, next) {
     if (roleName != null) {
       userRoleModules = await UserModule.find({});
     }
-    console.log(roleName, "Role Name")
+    console.log(roleName, "Role Name");
     Object.keys(userRoleModules).map(function (key) {
       var val = userRoleModules[key];
 
