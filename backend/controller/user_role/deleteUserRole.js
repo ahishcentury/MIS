@@ -1,8 +1,9 @@
 const adminUsers = require("../../helper/adminUsers");
-const UserRole = require("../../schemas/userRole");
+const UserRoleModel = require("../../schemas/userRole");
 module.exports = async function (req, res) {
     const { roleName } = req.body;
     const { email, userType } = req.payload;
+    let UserRole = UserRoleModel();
     if (!adminUsers.includes(email)) {
         return res.status(401).end();
     }

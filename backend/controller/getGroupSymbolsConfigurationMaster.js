@@ -1,9 +1,10 @@
-const groupSymbolConfiguration = require("../schemas/groupSymbolConfigurationMaster");
+const groupSymbolConfigurationModel = require("../schemas/groupSymbolConfigurationMaster");
 const getGroupSymbolConfiguration = async (req, res) => {
     try {
         let { groupName } = req.params;
         groupName = "real\\" + groupName;
         console.log(groupName);
+        let groupSymbolConfiguration = groupSymbolConfigurationModel();
         const symbolConfig = await groupSymbolConfiguration.find({ groupName: groupName });
         if (res.statusCode == 200) {
             res.json(symbolConfig);

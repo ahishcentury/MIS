@@ -17,6 +17,5 @@ const userRoleSchema = new Schema({
 }, {
     timestamps: true,
 });
-const UserRole = mongoose.model('userroles', userRoleSchema)
 
-module.exports = UserRole;
+module.exports = () => { let exportedModel = mongoose.connection.model('userroles', userRoleSchema); return exportedModel; }

@@ -1,11 +1,12 @@
 const { default: mongoose } = require('mongoose');
-const User = require('../../schemas/user');
+const UserModel = require('../../schemas/user');
 const validator = require("validator");
 
 
 module.exports = async function (req, res, next) {
-    let result = null;
     try {
+        let result = null;
+        let User = UserModel();
         const { fname, lname, email, phone, role, dob } = req.body;
 
         const isRegistered = await User.findOne({ $or: [{ email }, { phone }] });

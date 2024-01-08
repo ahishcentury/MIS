@@ -81,4 +81,5 @@ const openPositionSchema = new Schema(
     }
 );
 
-module.exports = mongoose.model('openpositions', openPositionSchema);
+
+module.exports = () => { let exportedModel = mongoose.connection.model('openpositions', openPositionSchema); return exportedModel; };

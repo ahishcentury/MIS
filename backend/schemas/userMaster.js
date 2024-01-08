@@ -17,4 +17,4 @@ const Users = Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model("users", Users);
+module.exports = () => { let exportedModel = mongoose.connection.model('users', Users); return exportedModel; };

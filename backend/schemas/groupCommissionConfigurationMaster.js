@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const groupCommissionConfigurationSchema = new Schema(
     {
         groupName: { type: String, required: true },
-        symbolPath:{ type: String, required: true },
+        symbolPath: { type: String, required: true },
         comType: { type: String, required: true },
         rangeType: { type: String, required: true },
         chargeType: { type: String, required: true },
@@ -22,5 +22,4 @@ const groupCommissionConfigurationSchema = new Schema(
     }
 );
 
-const groupCommissionConfiguration = mongoose.model('groupcommissionconfigurations', groupCommissionConfigurationSchema);
-module.exports = groupCommissionConfiguration;
+module.exports = () => { let exportedModel = mongoose.connection.model('groupcommissionconfigurations', groupCommissionConfigurationSchema); return exportedModel; };

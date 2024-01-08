@@ -30,5 +30,4 @@ const symbolMasterSchema = new Schema(
     }
 );
 
-const symbolMaster = mongoose.model('symbolmaster', symbolMasterSchema);
-module.exports = symbolMaster;
+module.exports = () => { let exportedModel = mongoose.connection.model('symbolmaster', symbolMasterSchema); return exportedModel; };

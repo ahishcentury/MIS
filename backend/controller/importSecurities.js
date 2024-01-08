@@ -1,4 +1,4 @@
-const Security = require('../schemas/security');
+const SecurityModel = require('../schemas/security');
 const jsonwebtoken = require("jsonwebtoken");
 
 
@@ -6,7 +6,7 @@ module.exports = function (req, res) {
     try {
 
         console.log(req.body.securities);
-
+        let Security = SecurityModel();
         Security.insertMany(req.body.securities).then(docs => {
             console.log(docs);
             res.json(docs);

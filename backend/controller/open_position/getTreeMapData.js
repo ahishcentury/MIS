@@ -1,4 +1,4 @@
-const OpenPosition = require("../../schemas/openPosition");
+const OpenPositionModel = require("../../schemas/openPosition");
 let path = require("path");
 const fs = require("fs");
 const getTreeMapData = async (req, res, next) => {
@@ -30,6 +30,7 @@ const getTreeMapData = async (req, res, next) => {
             args: ["$profitCur", currencyMap],
             lang: "js"
         }
+        let OpenPosition = OpenPositionModel();
         let data = await OpenPosition.aggregate([
             {
                 $facet: {

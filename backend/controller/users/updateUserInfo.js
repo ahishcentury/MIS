@@ -1,11 +1,11 @@
-const User = require('../../schemas/user');
+const UserModel = require('../../schemas/user');
 const mongoose = require('mongoose');
 
 module.exports = async function (req, res, next) {
 
-    let result = null;
     try {
-
+        let result = null;
+        let User = UserModel();
         let { userId, field, value } = req.body;
 
         if (field === "role")

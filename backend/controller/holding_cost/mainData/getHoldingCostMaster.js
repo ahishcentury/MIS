@@ -1,7 +1,8 @@
-const SwapChangeMaster = require("../../../schemas/dailySwapChangeMaster");
+const SwapChangeMasterModel = require("../../../schemas/dailySwapChangeMaster");
 
 const getHoldingCostMaster = async function (req, res, next) {
     try {
+        let SwapChangeMaster = SwapChangeMasterModel();
         let { startDate, endDate, client, symbol } = req.body;
         console.log(client, "    ", symbol)
         startDate = startDate == "" ? null : startDate;

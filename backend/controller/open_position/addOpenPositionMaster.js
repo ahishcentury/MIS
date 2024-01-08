@@ -1,9 +1,10 @@
-const OpenPosition = require("../../schemas/openPosition");
+const OpenPositionModel = require("../../schemas/openPosition");
 
 const addOpenPositionMaster = async function (req, res, next) {
     try {
         const openPositions = req.body;
         console.log(openPositions)
+        let OpenPosition = OpenPositionModel();
         let deleteData = await OpenPosition.deleteMany({})
         if (deleteData.acknowledged) {
             let data = await OpenPosition.insertMany(openPositions);

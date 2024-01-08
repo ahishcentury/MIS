@@ -18,5 +18,5 @@ const groupSymbolConfigurationSchema = new Schema(
     }
 );
 
-const groupSymbolConfiguration = mongoose.model('groupsymbolconfigurations', groupSymbolConfigurationSchema);
-module.exports = groupSymbolConfiguration;
+module.exports = () => { let exportedModel = mongoose.connection.model('groupsymbolconfigurations', groupSymbolConfigurationSchema); return exportedModel; };
+

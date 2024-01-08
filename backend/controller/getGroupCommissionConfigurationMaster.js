@@ -1,8 +1,9 @@
-const groupCommissionConfiguration = require("../schemas/groupCommissionConfigurationMaster");
+const groupCommissionConfigurationModel = require("../schemas/groupCommissionConfigurationMaster");
 
 module.exports = function (req, res) {
     try {
         let { groupName } = req.params;
+        let groupCommissionConfiguration = groupCommissionConfigurationModel();
         groupName = "real\\" + groupName;
         groupCommissionConfiguration.find({ groupName: groupName }).then((result) => {
             res.json(result);

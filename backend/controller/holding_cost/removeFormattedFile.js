@@ -1,9 +1,10 @@
-let FormattedFile = require("../../schemas/holdingRateMaster");
+let FormattedFileModel = require("../../schemas/holdingRateMaster");
 const fs = require("fs");
 const path = require("path");
 
 module.exports = async function (req, res, next) {
   const { fileId } = req.params;
+  let FormattedFile = FormattedFileModel()
   let data = await FormattedFile.findByIdAndDelete(fileId)
 
   if (data) {

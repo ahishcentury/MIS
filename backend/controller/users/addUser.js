@@ -1,7 +1,8 @@
-const Users = require("../../schemas/userMaster");
+const UsersModel = require("../../schemas/userMaster");
 const bcrypt = require("bcrypt");
 module.exports = async function (req, res) {
     console.log(req.body);
+    let Users = UsersModel();
     let {
         fname,
         lname,

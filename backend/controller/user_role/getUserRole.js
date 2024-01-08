@@ -1,6 +1,7 @@
-const UserRole = require("../../schemas/userRole");
+const UserRoleModel = require("../../schemas/userRole");
 
 module.exports = async function (req, res) {
+    let UserRole = UserRoleModel();
     UserRole.aggregate([
         {
             $match: { softDeleted: false }

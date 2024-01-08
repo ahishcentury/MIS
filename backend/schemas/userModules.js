@@ -8,4 +8,4 @@ const UserModules = Schema(
     { timestamps: true }
 );
 
-module.exports = mongoose.model("usermodules", UserModules);
+module.exports = () => { let exportedModel = mongoose.connection.model('usermodules', UserModules); return exportedModel; };

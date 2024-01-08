@@ -29,7 +29,7 @@ import StatCard from "../global_component/statCard-component";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import axios from "axios";
 import DateRangeTimePicker from "../../components/dateRangeTimePicker";
-import { GET_HOLDING_COST, GET_TREE_MAP_DATA } from "../../helper/apiString";
+import { BASE_URL, GET_HOLDING_COST, GET_TREE_MAP_DATA } from "../../helper/apiString";
 import { Divider } from "antd";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -198,7 +198,7 @@ const HoldingCostDashboard = () => {
     }
     function getHoldingCost() {
         setIsLoading(true)
-        axios.post(GET_HOLDING_COST, old).then((result) => {
+        axios.post(BASE_URL + "/TU" + GET_HOLDING_COST, old).then((result) => {
             setHoldingCost(result.data);
             setClientList(result.data[0].uniqueLists[0].totalClients);
             setSymbolList(result.data[0].uniqueLists[0].totalSymbols);
@@ -218,7 +218,7 @@ const HoldingCostDashboard = () => {
     }
     function getTreeMapData() {
         setIsLoadingTreeMapData(true)
-        axios.get(GET_TREE_MAP_DATA).then((result) => {
+        axios.get(BASE_URL + "/TU" + GET_TREE_MAP_DATA).then((result) => {
             setTreeMapData(result.data);
             setTreeMapDataFiltered(result.data[0].symbolTxnsCount)
             setIsLoadingTreeMapData(false)
@@ -387,9 +387,9 @@ const HoldingCostDashboard = () => {
 
                                     <span style={{ display: "flex", justifyContent: "center" }}>
                                         <h2>
-                                            Top Clients{" "}
+                                            {value == 0 ? "Top Clients " : "Top Symbols"}
                                             <InfoPopover
-                                                content={"Top Clients"}
+                                                content={value == 0 ? "Top Clients " : "Top Symbols"}
                                             />
                                         </h2>
                                         {holdingCost && <span style={{ marginLeft: "30%" }}><CSVLink
@@ -405,7 +405,7 @@ const HoldingCostDashboard = () => {
                                             setValue(value);
                                         }}
                                     >
-                                        <Tab style={{ width: "33%" }} label="By Volume" />
+                                        <Tab style={{ width: "33%" }} label="By Client" />
                                         <Tab style={{ width: "33%" }} label="By Symbol" />
                                     </Tabs>
                                     {value === 0 && (

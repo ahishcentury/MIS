@@ -1,6 +1,6 @@
-const symbolSchema = require("../schemas/symbolMaster");
-const userMaster = require("../schemas/userMaster");
-const UserRole = require("../schemas/userRole");
+const symbolModel = require("../schemas/symbolMaster");
+const userMasterModel = require("../schemas/userMaster");
+const UserRoleModel = require("../schemas/userRole");
 module.exports = async function (req, res) {
     // const {calledBy} = req.body;
     // const data = await symbolSchema.aggregate([
@@ -41,6 +41,9 @@ module.exports = async function (req, res) {
     const { email, userType } = req.payload;
     let roleName = null;
     let userRoleModulesPermission = null;
+    let symbolSchema = symbolModel();
+    let userMaster = userMasterModel();
+    let UserRole = UserRoleModel();
     let userData = await userMaster.findOne({ email: email });
     if (userData) {
         roleName = userData.role;

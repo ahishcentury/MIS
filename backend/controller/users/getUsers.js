@@ -1,6 +1,6 @@
-const Users = require("../../schemas/user");
+const UsersModel = require("../../schemas/user");
 const getUsers = function (req, res, err) {
-
+    let Users = UsersModel();
     Users.aggregate([
         {
             $match: { softDeleted: false }
