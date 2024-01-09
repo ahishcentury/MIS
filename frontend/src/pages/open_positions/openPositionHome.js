@@ -111,9 +111,9 @@ const OpenPositionHome = () => {
     // const [isLoadingTreeMapData, setIsLoadingTreeMapData] = useState(true);
     const [value, setValue] = React.useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [selectedClient, setSelectedClient] = useState("");
-    const [selectedSymbol, setSelectedSymbol] = useState("");
-    const [selectedDirection, setSelectedDirection] = useState("");
+    const [selectedClient, setSelectedClient] = useState("All");
+    const [selectedSymbol, setSelectedSymbol] = useState("All");
+    const [selectedDirection, setSelectedDirection] = useState("All");
     const [reloadData, setReloadData] = useState(true);
     const filterValues = useRef({
         filterByClient: "",
@@ -227,6 +227,9 @@ const OpenPositionHome = () => {
         }
     };
     function resetFilter() {
+        setSelectedClient("All");
+        setSelectedSymbol("All");
+        setSelectedDirection("All");
         filterValues.current = {
             filterByClient: "",
             filterBySymbol: "",
@@ -274,6 +277,15 @@ const OpenPositionHome = () => {
         old = filterValues.current;
         old[e.target.name] = e.target.value;
         filterValues.current = old;
+        if (e.target.name == "filterByClient") {
+            setSelectedClient(filterValues.current.filterByClient)
+        }
+        if (e.target.name == "filterBySymbol") {
+            setSelectedSymbol(filterValues.current.filterBySymbol)
+        }
+        if (e.target.name == "filterByPositionDirection") {
+            setSelectedDirection(filterValues.current.filterByPositionDirection)
+        }
     }
     useEffect(() => {
         getOpenPosition();
@@ -327,7 +339,7 @@ const OpenPositionHome = () => {
                                     <Autocomplete
                                         disablePortal
                                         size="small"
-                                        defaultValue={"All"}
+                                        value={selectedClient}
                                         onChange={(e, option) => {
                                             handleValueChange({
                                                 target: { name: "filterByClient", value: option },
@@ -345,7 +357,7 @@ const OpenPositionHome = () => {
                                     <Autocomplete
                                         disablePortal
                                         size="small"
-                                        defaultValue={"All"}
+                                        value={selectedDirection}
                                         onChange={(e, option) => {
                                             handleValueChange({
                                                 target: { name: "filterByPositionDirection", value: option },
@@ -363,7 +375,7 @@ const OpenPositionHome = () => {
                                     <Autocomplete
                                         disablePortal
                                         size="small"
-                                        defaultValue={"All"}
+                                        value={selectedSymbol}
                                         onChange={(e, option) => {
                                             handleValueChange({
                                                 target: { name: "filterBySymbol", value: option },

@@ -36,7 +36,6 @@ const addOpenPosition = require("../controller/open_position/addOpenPositionMast
 const getSwapChangeDashboard = require("../controller/holding_cost/mainData/getHoldingCostMaster.js");
 const getAllSwapChangeMaster = require("../controller/holding_cost/mainData/getAllSwapChangeMaster.js");
 const addSwapChangeMaster = require("../controller/holding_cost/mainData/addSwapChangeMaster.js");
-const getCentraAccounts = require("../controller/getCentraAccounts.js");
 const router = express.Router();
 
 router.get("/getUsers", verifyAccessToken, getUsers);

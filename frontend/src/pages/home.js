@@ -35,6 +35,7 @@ export default function Home(props) {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [iframeLoaded, setIframeLoaded] = useState(false);
+    const [iframeHeight, setIframeHeight] = useState(0);
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [tabPanelValue, setTabPanelValue] = useState(module);
     const toggleButtonStyle = { sx: { textTransform: 'none', color: context.headingColor } };
@@ -58,7 +59,6 @@ export default function Home(props) {
     }
 
     function userAuth() {
-        console.log("This is the main query");
         axios.post(CHECK_ALLOWED_USERS, { userType: localStorage.getItem("userType"), userEmail: localStorage.getItem("email") })
             .then((res) => {
                 axios.post(BASE_URL + "/" + "TU" + GET_ROLE_BASE_TAB_LIST, { email: localStorage.getItem("email") })
@@ -92,6 +92,13 @@ export default function Home(props) {
     useEffect(() => {
         userAuth();
     }, [])
+    useEffect(() => {
+        if (module === "Account Dashboard") {
+            let customBoxHeight = document.getElementById("customId").style.height;
+            setIframeHeight(customBoxHeight);
+            console.log(customBoxHeight);
+        }
+    }, [module])
     // return <SideBar tabList={tabList} />;
     return (
         <Box sx={{ display: 'flex', width: '100vw', height: '100vh', flexDirection: 'row', overflow: 'hidden' }}>
@@ -100,7 +107,7 @@ export default function Home(props) {
 
             <Divider orientation='vertical' sx={{ height: '100%' }} />
 
-            <Box sx={{ flex: 1, height: '100%', overflow: 'scroll', boxSizing: 'border-box' }}>
+            <Box sx={{ flex: 1, height: '100%', overflow: 'scroll', boxSizing: 'border-box' }} id={"customId"}>
 
                 <Divider />
                 {module === "Fee Groups" && <FeeGroups />}
@@ -112,7 +119,7 @@ export default function Home(props) {
                 {module === "Holding Cost Rebate" && <HoldingCostFileUploads />}
                 {module === "Holding Cost Dashboard" && <HoldingCostDashboard />}
                 {module === "Account Dashboard" &&
-                    <div>{<iframe src="https://dashboard.century.ae/tu-file-uploader/home" width="100%" height="1050" style={{ overflowX: "hidden" }} onload={handleIframeLoad}></iframe>}</div>}
+                    <div>{<iframe src="https://dashboard.century.ae/tu-file-uploader/home" width="100%" height="990" style={{ overflowX: "hidden", border: "none" }} onload={handleIframeLoad}></iframe>}</div>}
 
                 <Snackbar
                     open={context.snackbarMsg}

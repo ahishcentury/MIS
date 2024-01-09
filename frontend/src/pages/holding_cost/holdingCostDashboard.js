@@ -107,6 +107,8 @@ const HoldingCostDashboard = () => {
     const [value, setValue] = React.useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [reloadData, setReloadData] = useState(true);
+    const [client, setClient] = useState("All");
+    const [symbol, setSymbol] = useState("All");
     const [dateRange, setDateRange] = useState([]);
     const filterValues = useRef({
         client: "",
@@ -249,6 +251,9 @@ const HoldingCostDashboard = () => {
             startDate: "",
             endDate: "",
         };
+        setDateRange([])
+        setClient("All");
+        setSymbol("All");
     }
     function getHoldingCost() {
         setIsLoading(true)
@@ -281,6 +286,12 @@ const HoldingCostDashboard = () => {
         old = filterValues.current;
         old[e.target.name] = e.target.value;
         filterValues.current = old;
+        if (e.target.name == "client") {
+            setClient(filterValues.current.client)
+        }
+        if (e.target.name == "symbol") {
+            setSymbol(filterValues.current.symbol)
+        }
     }
     useEffect(() => {
         getHoldingCost();
@@ -333,7 +344,7 @@ const HoldingCostDashboard = () => {
                                     <Autocomplete
                                         disablePortal
                                         size="small"
-                                        defaultValue={"All"}
+                                        value={client}
                                         onChange={(e, option) => {
                                             handleValueChange({
                                                 target: { name: "client", value: option },
@@ -351,7 +362,7 @@ const HoldingCostDashboard = () => {
                                     <Autocomplete
                                         disablePortal
                                         size="small"
-                                        defaultValue={"All"}
+                                        value={symbol}
                                         onChange={(e, option) => {
                                             handleValueChange({
                                                 target: { name: "symbol", value: option },
