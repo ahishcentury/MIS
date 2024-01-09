@@ -4,7 +4,6 @@ const getHoldingCostMaster = async function (req, res, next) {
     try {
         let SwapChangeMaster = SwapChangeMasterModel();
         let { startDate, endDate, client, symbol } = req.body;
-        console.log(client, "    ", symbol)
         startDate = startDate == "" ? null : startDate;
         endDate = endDate == "" ? null : endDate;
         client = client == "" ? null : client;

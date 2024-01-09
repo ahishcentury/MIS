@@ -36,6 +36,7 @@ const addOpenPosition = require("../controller/open_position/addOpenPositionMast
 const getSwapChangeDashboard = require("../controller/holding_cost/mainData/getHoldingCostMaster.js");
 const getAllSwapChangeMaster = require("../controller/holding_cost/mainData/getAllSwapChangeMaster.js");
 const addSwapChangeMaster = require("../controller/holding_cost/mainData/addSwapChangeMaster.js");
+const getCentraAccounts = require("../controller/getCentraAccounts.js");
 const router = express.Router();
 
 router.get("/getUsers", verifyAccessToken, getUsers);
@@ -102,7 +103,7 @@ router.post("/getAccessToken", getAccessToken);
 
 router.post("/getOpenPositionMaster", getOpenPositionMaster);
 
-router.get("/getTreeMapData", getTreeMapData);
+router.post("/getTreeMapData", getTreeMapData);
 
 router.post("/addOpenPositionMaster", addOpenPosition);
 
@@ -111,8 +112,6 @@ router.get("/getAllSwapChangeMaster", getAllSwapChangeMaster);
 router.post("/getHoldingCostMaster", getSwapChangeDashboard);
 
 router.post("/addSwapChangeMaster", addSwapChangeMaster);
-
-
 
 router.get("/getPublicKey", function (req, res, next) {
     res.json(ENCODED_PUBLIC_KEY);

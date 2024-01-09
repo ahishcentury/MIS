@@ -2,38 +2,38 @@ const OpenPositionModel = require("../../schemas/openPosition");
 let path = require("path");
 const fs = require("fs");
 const getOpenPositionMaster = async (req, res, next) => {
-    console.log(req.body);
-    const { filterByClient, filterByPositionDirection, filterBySymbol } = req.body;
-    console.log(filterByPositionDirection);
-    console.log(filterBySymbol);
-    let searchQuery = {}
-    let OpenPosition = OpenPositionModel();
     try {
-        if (filterByClient != null && filterByClient !== "") {
+        let { filterByClient, filterByPositionDirection, filterBySymbol } = req.body;
+        let searchQuery = {}
+        let OpenPosition = OpenPositionModel();
+        filterByClient = filterByClient == "" || filterByClient == "All" ? null : filterByClient;
+        filterByPositionDirection = filterByPositionDirection == "" || filterByPositionDirection == "All" ? null : filterByPositionDirection;
+        filterBySymbol = filterBySymbol == "" || filterBySymbol == "All" ? null : filterBySymbol;
+        if (filterByClient != null) {
             searchQuery.loginid = filterByClient
-            if (filterByPositionDirection != null && filterByPositionDirection !== "") {
+            if (filterByPositionDirection != null) {
                 searchQuery.type = filterByPositionDirection;
             }
-            if (filterBySymbol != null && filterBySymbol !== "") {
+            if (filterBySymbol != null) {
                 searchQuery.symbol = filterBySymbol;
             }
         }
 
-        else if (filterByPositionDirection != null && filterByPositionDirection !== "") {
+        else if (filterByPositionDirection != null) {
             searchQuery.type = filterByPositionDirection;
-            if (filterByClient != null && filterByClient !== "") {
+            if (filterByClient != null) {
                 searchQuery.loginid = filterByClient
             }
-            if (filterBySymbol != null && filterBySymbol !== "") {
+            if (filterBySymbol != null) {
                 searchQuery.symbol = filterBySymbol;
             }
         }
-        else if (filterBySymbol != null && filterBySymbol !== "") {
+        else if (filterBySymbol != null) {
             searchQuery.symbol = filterBySymbol;
-            if (filterByPositionDirection != null && filterByPositionDirection !== "") {
+            if (filterByPositionDirection != null) {
                 searchQuery.type = filterByPositionDirection;
             }
-            if (filterByClient != null && filterByClient !== "") {
+            if (filterByClient != null) {
                 searchQuery.loginid = filterByClient
             }
         }

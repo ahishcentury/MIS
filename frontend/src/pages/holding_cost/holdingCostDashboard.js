@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Column } from '@ant-design/plots';
 import { forEach, groupBy } from 'lodash-es';
 import {
@@ -31,6 +31,54 @@ import axios from "axios";
 import DateRangeTimePicker from "../../components/dateRangeTimePicker";
 import { BASE_URL, GET_HOLDING_COST, GET_TREE_MAP_DATA } from "../../helper/apiString";
 import { Divider } from "antd";
+import { Tooltip } from "antd";
+import Switch from "@mui/material/Switch";
+import UserRoleConext from "../user_roles/userRoleContext";
+import { infoMapHoldingCost, namingMapHoldingCost } from "../constants";
+const AntSwitch = styled(Switch)(({ theme }) => ({
+    width: 28,
+    height: 16,
+    padding: 0,
+    display: "flex",
+    "&:active": {
+        "& .MuiSwitch-thumb": {
+            width: 15,
+        },
+        "& .MuiSwitch-switchBase.Mui-checked": {
+            transform: "translateX(9px)",
+        },
+    },
+    "& .MuiSwitch-switchBase": {
+        padding: 2,
+        "&.Mui-checked": {
+            transform: "translateX(12px)",
+            color: "#fff",
+            "& + .MuiSwitch-track": {
+                opacity: 1,
+                backgroundColor:
+                    theme.palette.mode === "dark" ? "#04832a" : "#04832a",
+            },
+        },
+    },
+    "& .MuiSwitch-thumb": {
+        boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        transition: theme.transitions.create(["width"], {
+            duration: 200,
+        }),
+    },
+    "& .MuiSwitch-track": {
+        borderRadius: 16 / 2,
+        opacity: 1,
+        backgroundColor:
+            theme.palette.mode === "dark"
+                ? "rgba(255,255,255,.35)"
+                : "rgba(0,0,0,.25)",
+        boxSizing: "border-box",
+    },
+}));
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
         backgroundColor: theme.palette.common.black,
@@ -55,12 +103,7 @@ const HoldingCostDashboard = () => {
     const [holdingCost, setHoldingCost] = useState();
     const [clientList, setClientList] = useState();
     const [symbolList, setSymbolList] = useState();
-    const [directionList, setDirectionList] = useState(["BUY", "SELL"]);
-    const [treeMapData, setTreeMapData] = useState();
-    const [treeMapDataFiltered, setTreeMapDataFiltered] = useState();
-    const [treeMapDataFilterBy, setTreeMapDataFilterBy] = useState("byTxnCount");
     const [isLoading, setIsLoading] = useState(true);
-    const [isLoadingTreeMapData, setIsLoadingTreeMapData] = useState(true);
     const [value, setValue] = React.useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [reloadData, setReloadData] = useState(true);
@@ -71,6 +114,7 @@ const HoldingCostDashboard = () => {
         startDate: "",
         endDate: "",
     });
+    const userContext = useContext(UserRoleConext);
     const columns = [
         {
             field: "client",
@@ -188,20 +232,36 @@ const HoldingCostDashboard = () => {
             align: "center",
         },
     ];
+    const togglePlatformType = () => {
+        resetFilter();
+        setReloadData(true);
+        if (userContext.platformType == "TU") {
+            userContext.setPlatformType("CFC");
+        }
+        else {
+            userContext.setPlatformType("TU");
+        }
+    };
     function resetFilter() {
         filterValues.current = {
-            client: null,
-            symbol: null,
-            startDate: null,
-            endDate: null,
+            client: "",
+            symbol: "",
+            startDate: "",
+            endDate: "",
         };
     }
     function getHoldingCost() {
         setIsLoading(true)
-        axios.post(BASE_URL + "/TU" + GET_HOLDING_COST, old).then((result) => {
+        axios.post(BASE_URL + "/" + userContext.platformType + GET_HOLDING_COST, filterValues.current).then((result) => {
             setHoldingCost(result.data);
-            setClientList(result.data[0].uniqueLists[0].totalClients);
-            setSymbolList(result.data[0].uniqueLists[0].totalSymbols);
+            if (result.data[0]["swapChangeMasterData"].length != 0) {
+                setClientList(result.data[0].uniqueLists[0].totalClients);
+                setSymbolList(result.data[0].uniqueLists[0].totalSymbols);
+            }
+            else {
+                setClientList([]);
+                setSymbolList([])
+            }
             setIsLoading(false)
         }).catch((e) => {
             setIsLoading(true)
@@ -216,50 +276,36 @@ const HoldingCostDashboard = () => {
         setReloadData(!reloadData);
         resetFilter();
     }
-    function getTreeMapData() {
-        setIsLoadingTreeMapData(true)
-        axios.get(BASE_URL + "/TU" + GET_TREE_MAP_DATA).then((result) => {
-            setTreeMapData(result.data);
-            setTreeMapDataFiltered(result.data[0].symbolTxnsCount)
-            setIsLoadingTreeMapData(false)
-        }).catch((e) => {
-            setIsLoadingTreeMapData(true)
-            console.log(e.message)
-        })
-    }
-    let old = filterValues.current;
     const handleValueChange = (e) => {
+        let old = filterValues.current;
         old = filterValues.current;
         old[e.target.name] = e.target.value;
         filterValues.current = old;
     }
     useEffect(() => {
         getHoldingCost();
-        getTreeMapData();
-    }, [reloadData]);
-    let namingMap = {
-        "totalSwap": "Total Swap",
-        "totalMarkup": "Total Markup Swap",
-        "totalLpSwap": "Total LP Swap",
-        "totalClients": "Total Clients",
-        "totalSymbols": "Total Symbols",
-        "totalPosition": "Total Positions",
-    }
-    let infoMap = {
-        "totalSwap": "Total Swap",
-        "totalMarkup": "Total Markup Swap",
-        "totalLpSwap": "Total LP Swap",
-        "totalClients": "Total Clients",
-        "totalSymbols": "Total Symbols",
-        "totalPosition": "Total Positions",
-    }
+    }, [reloadData, userContext.platformType]);
     return <>
-        {holdingCost && treeMapData ? <Box>
+        {<Box>
             <Grid container spacing={5} p={3} mb={3} alignItems="center"
                 justifyContent="center" sx={{ backgroundColor: "#ffd700" }}>
-                <Grid item >
+                <Grid item lg={9} xl={9} md={9} sm={12} xs={12}>
                     <Typography style={{ fontWeight: 700, fontSize: 24 }}>Holding Cost Dashboard
                     </Typography>
+                </Grid>
+                <Grid item sx={{ display: "flex" }}>
+                    <Typography style={{ fontWeight: 700 }}>CENTURY</Typography>
+                    <Tooltip title={!reloadData && holdingCost ? "Data is Loading" : ""}>
+                        <span style={{ padding: "5px" }}><AntSwitch
+                            disabled={!isLoading ? false : true}
+                            checked={userContext.platformType == "TU" ? true : false}
+                            onChange={(checked) => {
+                                togglePlatformType();
+                            }}
+                            inputProps={{ "aria-label": "ant design" }}
+                        /></span>
+                    </Tooltip>
+                    <Typography style={{ fontWeight: 700 }}>TU</Typography>
                 </Grid>
             </Grid>
             <Paper
@@ -282,7 +328,7 @@ const HoldingCostDashboard = () => {
                                 width: "100%",
                             }}
                         >
-                            {clientList && <Grid item lg={2} xl={2} md={2} sm={6} xs={12}>
+                            {<Grid item lg={2} xl={2} md={2} sm={6} xs={12}>
                                 <FormControl sx={{ width: "100%" }}>
                                     <Autocomplete
                                         disablePortal
@@ -300,7 +346,7 @@ const HoldingCostDashboard = () => {
                                     />
                                 </FormControl>
                             </Grid>}
-                            {symbolList && <Grid item lg={2} xl={2} md={2} sm={6} xs={12}>
+                            {<Grid item lg={2} xl={2} md={2} sm={6} xs={12}>
                                 <FormControl sx={{ width: "100%" }}>
                                     <Autocomplete
                                         disablePortal
@@ -351,26 +397,25 @@ const HoldingCostDashboard = () => {
                 </Grid>
             </Paper>
             {/* Lower section */}
-            <Paper>
-                {!isLoading && <Grid container spacing={2} p={1} mt={1} alignItems="center"
+            {!isLoading ? <Paper>
+                {holdingCost[0].statistics[0] && !isLoading && <Grid container spacing={2} p={1} mt={1} alignItems="center"
                     justifyContent="center">
                     {Object.keys(holdingCost[0].statistics[0]).map((key, index) => {
                         return <Grid item {...statCardGridSize}>
                             <StatCard
                                 value={Math.abs(holdingCost[0].statistics[0][key]).toLocaleString()}
-                                heading={namingMap[key]}
-                                infoKey={infoMap[key]}
+                                heading={namingMapHoldingCost[key]}
+                                infoKey={infoMapHoldingCost[key]}
                             />
                         </Grid>
                     })}
                 </Grid>}
-                {/* This is the Lower Map */}
                 <Divider></Divider>
                 <Paper sx={{ marginTop: "10px" }}>
                     <Grid container spacing={2} p={2} sx={{ backgroundColor: "white" }}>
-                        <Grid item lg={6} xl={6} md={6} sm={12} xs={12}>
+                        {holdingCost[0].barCharData.length != 0 ? <Grid item lg={6} xl={6} md={6} sm={12} xs={12}>
                             <BarChartCompnent sx={{ height: "250px !important", }} swapData={holdingCost[0].barCharData} />
-                        </Grid>
+                        </Grid> : <Grid item lg={6} xl={6} md={6} sm={12} xs={12} sx={{ fontWeight: "bold", color: "#ffd700", fontSize: "22px" }}>Data Not Found</Grid>}
                         <Grid item lg={6} xl={6} md={6} sm={12} xs={12}>
                             <Box
                                 sx={{
@@ -538,8 +583,8 @@ const HoldingCostDashboard = () => {
                         </Grid>
                     </Grid>
                 </Paper>
-            </Paper >
-        </Box > : <><LinearProgress sx={{ justifyContent: "center>" }} /><h1>Loading...</h1></>}</>
+            </Paper > : <><LinearProgress sx={{ justifyContent: "center>" }} /><h1>Loading...</h1></>}
+        </Box >}</>
 }
 function BarChartCompnent(props) {
     const [data, setData] = useState(props.swapData);

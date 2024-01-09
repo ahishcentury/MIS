@@ -4,7 +4,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
-import { Button, Snackbar, Alert, Box, IconButton, Badge, Popover, ListItemIcon, List, Divider, Tab, Tabs, ListItem, ListItemText, ListItemButton, Stack, Typography } from '@mui/material';
+import { Button, Snackbar, Alert, Box, IconButton, Badge, Popover, ListItemIcon, List, Divider, Tab, Tabs, ListItem, ListItemText, ListItemButton, Stack, Typography, CircularProgress } from '@mui/material';
 import FeeGroups from './groups/feeGroups';
 import Symbols from './symbols/symbols';
 import SMTP from './smtp/index';
@@ -34,6 +34,7 @@ export default function Home(props) {
     const context = useContext(AppContext);
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
+    const [iframeLoaded, setIframeLoaded] = useState(false);
     const [notificationsCount, setNotificationsCount] = useState(0);
     const [tabPanelValue, setTabPanelValue] = useState(module);
     const toggleButtonStyle = { sx: { textTransform: 'none', color: context.headingColor } };
@@ -72,6 +73,7 @@ export default function Home(props) {
                             }
                         }
                         allowedTabList.push({ label: "HC Dashboard", value: "Holding Cost Dashboard" })
+                        allowedTabList.push({ label: "Account Dashboard", value: "Account Dashboard" })
                         setTabList(allowedTabList);
                         setModulePermissionData(modulePermissionObj);
                     })
@@ -83,6 +85,10 @@ export default function Home(props) {
                 console.log("Auth Error", err.message)
             })
     }
+    function handleIframeLoad() {
+        console.log("iframe loaded");
+    }
+
     useEffect(() => {
         userAuth();
     }, [])
@@ -105,6 +111,8 @@ export default function Home(props) {
                 {module === "SMTP Setup" && <SMTP modulePermissionData={modulePermissionData["SMTP Setup"]} />}
                 {module === "Holding Cost Rebate" && <HoldingCostFileUploads />}
                 {module === "Holding Cost Dashboard" && <HoldingCostDashboard />}
+                {module === "Account Dashboard" &&
+                    <div>{<iframe src="https://dashboard.century.ae/tu-file-uploader/home" width="100%" height="1050" style={{ overflowX: "hidden" }} onload={handleIframeLoad}></iframe>}</div>}
 
                 <Snackbar
                     open={context.snackbarMsg}
@@ -126,7 +134,7 @@ export default function Home(props) {
                 </Snackbar>
 
 
-                {!["theming", "Holding Cost", "Holding Cost Dashboard", "automations", "Open Position", "Users", "registration", "Fee Groups", "Symbols", "User Roles", "approvalStages", "emailDesigner", "legalDocs", "SMTP Setup"].includes(module) &&
+                {!["theming", "Holding Cost", "Holding Cost Dashboard", "Account Dashboard", "automations", "Open Position", "Users", "registration", "Fee Groups", "Symbols", "User Roles", "approvalStages", "emailDesigner", "legalDocs", "SMTP Setup"].includes(module) &&
                     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                         <Typography variant="h1">404</Typography>
 
@@ -158,7 +166,6 @@ export default function Home(props) {
                 return
 
             }
-            console.log(tabValue, " Look I m the tab value")
             setTabPanelValue(tabValue);
             navigate("/mis_home/" + tabValue);
 

@@ -24,7 +24,6 @@ import TreeMapComponent from "../global_component/treeMapChart";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { CSVLink, CSVDownload } from "react-csv";
 import { tableCellClasses } from "@mui/material/TableCell";
-import { Tooltip } from "antd";
 import { styled } from "@mui/material/styles";
 import StatCard from "../global_component/statCard-component";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
@@ -32,8 +31,10 @@ import axios from "axios";
 import { motion } from "framer-motion"
 import { BASE_URL, GET_OPEN_POSITION_MASTER, GET_TREE_MAP_DATA } from "../../helper/apiString";
 import { Divider } from "antd";
+import { Tooltip } from "antd";
 import Switch from "@mui/material/Switch";
 import UserRoleConext from "../user_roles/userRoleContext";
+import { infoMapOpenPosition, namingMapOpenposition } from "../constants";
 const AntSwitch = styled(Switch)(({ theme }) => ({
     width: 28,
     height: 16,
@@ -214,7 +215,9 @@ const OpenPositionHome = () => {
             align: "center",
         },
     ];
+    console.log("I m called", filterValues.current)
     const togglePlatformType = () => {
+        resetFilter();
         setReloadData(true);
         if (userContext.platformType == "TU") {
             userContext.setPlatformType("CFC");
@@ -250,7 +253,7 @@ const OpenPositionHome = () => {
         })
     }
     const callGetOpenPosition = () => {
-        setReloadData(!reloadData);
+        // setReloadData(!reloadData);
         getOpenPosition();
     }
     const callResetFilter = () => {
@@ -258,8 +261,7 @@ const OpenPositionHome = () => {
         resetFilter();
     }
     function getTreeMapData() {
-        axios.get(BASE_URL + "/" + userContext.platformType + GET_TREE_MAP_DATA).then((result) => {
-            console.log(result.data);
+        axios.post(BASE_URL + "/" + userContext.platformType + GET_TREE_MAP_DATA, old).then((result) => {
             setTreeMapData(result.data);
             setTreeMapDataFiltered(result.data[0].symbolTxnsCount);
             setIsLoading(false);
@@ -276,41 +278,28 @@ const OpenPositionHome = () => {
     useEffect(() => {
         getOpenPosition();
     }, [reloadData, userContext.platformType]);
-    let namingMap = {
-        "countOfOpenPosition": "Total Positions",
-        "unRealizedSwapTotal": "Total Unrealized Swap",
-        "tradeVolumeTotal": "Total Trade Volume",
-        "symbolCount": "Total Symbols",
-        "userCount": "Total Users"
-    }
-    let infoMap = {
-        "countOfOpenPosition": "Total Open Positions",
-        "unRealizedSwapTotal": "Total Unrealized Swap",
-        "tradeVolumeTotal": "Total Trade Volume",
-        "symbolCount": "Total number of traded Symbols",
-        "userCount": "Total open position's Users "
-    }
+
     return <>
         {openPosition && treeMapData && !isLoading ? <Box>
             <Grid container spacing={5} p={3} mb={3} alignItems="center"
                 justifyContent="center" sx={{ backgroundColor: "#ffd700" }}>
-                <Grid item >
+                <Grid item lg={9} xl={9} md={9} sm={12} xs={12}>
                     <Typography style={{ fontWeight: 700, fontSize: 24 }}>Open Position Dashboard
                     </Typography>
                 </Grid>
-                <Grid item >
-                    <Tooltip title={!reloadData && openPosition && treeMapData ? "" : "Data is Loading"}>
-                        <span><AntSwitch
+                <Grid item sx={{ display: "flex" }}>
+                    <Typography style={{ fontWeight: 700 }}>CENTURY</Typography>
+                    <Tooltip title={!reloadData && openPosition && treeMapData ? "Data is Loading" : ""}>
+                        <span style={{ padding: "5px" }}><AntSwitch
                             disabled={!isLoading ? false : true}
                             checked={userContext.platformType == "TU" ? true : false}
                             onChange={(checked) => {
-
-                                console.log(treeMapData)
                                 togglePlatformType();
                             }}
                             inputProps={{ "aria-label": "ant design" }}
                         /></span>
                     </Tooltip>
+                    <Typography style={{ fontWeight: 700 }}>TU</Typography>
                 </Grid>
             </Grid>
             <Paper
@@ -420,8 +409,8 @@ const OpenPositionHome = () => {
                         return <Grid item {...statCardGridSize}>
                             <StatCard
                                 value={Math.abs(openPosition[0].statistics[0][key]).toLocaleString()}
-                                heading={namingMap[key]}
-                                infoKey={infoMap[key]}
+                                heading={namingMapOpenposition[key]}
+                                infoKey={infoMapOpenPosition[key]}
                             />
                         </Grid>
                     })}

@@ -4,7 +4,42 @@ const fs = require("fs");
 const getTreeMapData = async (req, res, next) => {
 
     try {
-        // const { query } = req.body;
+        let { filterByClient, filterByPositionDirection, filterBySymbol } = req.body;
+        let searchQuery = {};
+        filterByClient = filterByClient == "" || filterByClient == "All" ? null : filterByClient;
+        filterByPositionDirection = filterByPositionDirection == "" || filterByPositionDirection == "All" ? null : filterByPositionDirection;
+        filterBySymbol = filterBySymbol == "" || filterBySymbol == "All" ? null : filterBySymbol;
+        if (filterByClient != null) {
+            searchQuery.loginid = filterByClient
+            if (filterByPositionDirection != null) {
+                searchQuery.type = filterByPositionDirection;
+            }
+            if (filterBySymbol != null) {
+                searchQuery.symbol = filterBySymbol;
+            }
+        }
+
+        else if (filterByPositionDirection != null) {
+            searchQuery.type = filterByPositionDirection;
+            if (filterByClient != null) {
+                searchQuery.loginid = filterByClient
+            }
+            if (filterBySymbol != null) {
+                searchQuery.symbol = filterBySymbol;
+            }
+        }
+        else if (filterBySymbol != null) {
+            searchQuery.symbol = filterBySymbol;
+            if (filterByPositionDirection != null) {
+                searchQuery.type = filterByPositionDirection;
+            }
+            if (filterByClient != null) {
+                searchQuery.loginid = filterByClient
+            }
+        }
+        else {
+            searchQuery = {}
+        }
         const query = "byVolume";
         let queryMap = {}
         if (query == "bycount") {
@@ -32,6 +67,9 @@ const getTreeMapData = async (req, res, next) => {
         }
         let OpenPosition = OpenPositionModel();
         let data = await OpenPosition.aggregate([
+            {
+                $match: searchQuery
+            },
             {
                 $facet: {
                     symbolTxnsCount: [
